@@ -13,6 +13,11 @@ enum class CharacterState{
     Jump
 };
 
+struct Animation{
+    sf::Texture texture;
+    std::vector<sf::IntRect> frames;
+};
+
 class Character : public sf::Sprite{
 public:
     Character(const std::string& texturePath); //konstruktor ktory przekazuje adres pliku png z textura
@@ -20,7 +25,7 @@ public:
     void move(int horizontalDirection, bool jump, float dt); //metoda ktora bedzie aktualizowala pozycje z uwzgledniem grawitacji gdzie pierwsze przymuje wartosci {-1,0,1}
     void update(int horizontalDirection, bool jump, float dt); // jednoczesne wywolanie move i animate
     void setGroundContact(bool grounding); //ustawienie statusu isOnground
-private:
+protected:
     //parametry podstawowe
     sf::Texture texture;
     sf::Vector2f velocity; //moveSpeed*deltaTime czyli przeiszczenie
@@ -43,6 +48,17 @@ private:
     //metody
     void loadAnimation(); //przypsianie statnow do konkretnych miejsc w texturze
     void setAnimationState(CharacterState newState); //sprawdzanie czy stan sie zmienil wzgedem aktualnego, jesli tak to zmienia set animacji
+};
+
+class NPC : public Character{
+public:
+    NPC(const std::string& texturePath, const bool &isShooting, std::pair<float, float> maxPositions); //wywolanie wraz z przypisaniem plikow z animacjami
+    void move(float dt);
+private:
+    std::pair<float, float> maxPositions; //pozycje przy koterych npc bedzie zawracał
+    bool isShooting; //nadanie czy npc bedzie strzelal
+
+    void loadAnimation();
 };
 
 #endif // CHARACTERS_H

@@ -3,18 +3,21 @@
 #include "characters.h"
 
 int main() {
-    sf::RenderWindow window(sf::VideoMode(800, 600), "Character Test");
+    sf::RenderWindow window(sf::VideoMode(800, 600), "Character & NPC Demo");
     window.setFramerateLimit(60);
 
-    // Tworzenie postaci z pliku tekstury
+    // Gracz
     Character player("Characters\\Character 9.png");
 
-    // Prostokąt udający podłogę
+    // NPC (chodzi automatycznie od x = 100 do x = 700)
+    NPC npc("Characters\\Mushroom.png", false, {100.f, 700.f});
+    npc.setPosition(300.f, 500.f);
+
+    // Podłoga
     sf::RectangleShape ground(sf::Vector2f(800, 50));
     ground.setFillColor(sf::Color::Green);
     ground.setPosition(0, 550);
 
-    // Zegar do pomiaru czasu między klatkami
     sf::Clock clock;
 
     while (window.isOpen()) {
@@ -24,10 +27,9 @@ int main() {
                 window.close();
         }
 
-        // Delta time
         float dt = clock.restart().asSeconds();
 
-        // Odczyt sterowania
+        // Sterowanie graczem
         int horizontal = 0;
         bool jump = false;
 
@@ -39,7 +41,7 @@ int main() {
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
             jump = true;
 
-        // Detekcja kolizji z podłożem (prosta)
+        // Kolizja gracza z podłożem
         if (player.getPosition().y + player.getGlobalBounds().height >= ground.getPosition().y) {
             player.setPosition(player.getPosition().x, ground.getPosition().y - player.getGlobalBounds().height);
             player.setGroundContact(true);
@@ -47,13 +49,24 @@ int main() {
             player.setGroundContact(false);
         }
 
-        // Aktualizacja postaci
+        // NPC nie skacze, ale też ograniczamy go do podłogi
+        if (npc.getPosition().y + npc.getGlobalBounds().height >= ground.getPosition().y) {
+            npc.setPosition(npc.getPosition().x, ground.getPosition().y - npc.getGlobalBounds().height);
+            npc.setGroundContact(true);
+        } else {
+            npc.setGroundContact(false);
+        }
+
+        // Aktualizacja
         player.update(horizontal, jump, dt);
+        npc.move(dt);  // NPC chodzi samodzielnie
+        npc.animate(dt);
 
         // Rysowanie
         window.clear(sf::Color::Cyan);
         window.draw(ground);
         window.draw(player);
+        window.draw(npc);
         window.display();
     }
 
