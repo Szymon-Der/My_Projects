@@ -1,5 +1,9 @@
 #include "characters.h"
 
+//=======================================
+//------------Character------------------
+//=======================================
+
 //konstrukotr nadajacy wartosci fizyczne oraz przypisujacy plik z textura jako zmienna
 Character::Character(const std::string& texturePath) :
     isOnGround(false), facingRight(true), moveSpeed(150.f),
@@ -88,11 +92,34 @@ void Character::setGroundContact(bool grounding){
     isOnGround = grounding;
 }
 
-NPC::NPC(const std::string& texturePath,const bool &isShooting, std::pair<float, float> maxPositions) : Character(texturePath), isShooting(isShooting), maxPositions(maxPositions){
+//=======================================
+//---------------NPC---------------------
+//=======================================
+
+//kostruktor dla pourszajacego sie npc
+NPC::NPC(const std::string& texturePath, bool isShooting, std::pair<float, float> maxPositions) :
+    Character(texturePath), isShooting(isShooting), maxPositions(maxPositions){
     loadAnimation();
     setAnimationState(CharacterState::Run);
     this->moveSpeed = 100.f;
 }
+
+//konstruktor nieporuszajacego sie npc
+NPC::NPC(const std::string& texturePath, bool isShooting, bool isFacingRight): Character(texturePath), isShooting(isShooting){
+    loadAnimation();
+    setAnimationState(CharacterState::Run);
+    this->moveSpeed = 0.f;
+    this->facingRight = isFacingRight;
+    if(!isFacingRight){
+        setScale(1.f, 1.f);
+        setOrigin(getGlobalBounds().width, 0);
+    }
+    else{
+        setScale(-1.f, 1.f);
+        setOrigin(0, 0);
+    }
+}
+
 
 //poruszanie sie prawo lewo miedzy znacznikami nadanymi w kostrutkorze
 void NPC::move(float dt){
@@ -100,10 +127,12 @@ void NPC::move(float dt){
     float x = getPosition().x;
 
     // Sprawdzenie granic — zakładamy brak zmiany originu
-    if (x + getGlobalBounds().width > maxPositions.second && facingRight) {
-        facingRight = false;
-    } else if (x < maxPositions.first && !facingRight) {
-        facingRight = true;
+    if(moveSpeed!=0){
+        if (x + getGlobalBounds().width > maxPositions.second && facingRight) {
+            facingRight = false;
+        } else if (x < maxPositions.first && !facingRight) {
+            facingRight = true;
+        }
     }
 
     if (facingRight) {

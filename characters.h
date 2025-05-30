@@ -52,8 +52,10 @@ protected:
 
 class NPC : public Character{
 public:
-    NPC(const std::string& texturePath, const bool &isShooting, std::pair<float, float> maxPositions); //wywolanie wraz z przypisaniem plikow z animacjami
+    NPC(const std::string& texturePath, bool isShooting, std::pair<float, float> maxPositions); //wywolanie wraz z przypisaniem plikow z animacjami
+    NPC(const std::string& texturePath, bool isShooting, bool isFacingRight);    // konstruktor ktory wywoluje npc ktroy sie nie porusza
     void move(float dt);
+
 private:
     std::pair<float, float> maxPositions; //pozycje przy koterych npc bedzie zawracał
     bool isShooting; //nadanie czy npc bedzie strzelal

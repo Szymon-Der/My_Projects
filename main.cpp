@@ -10,7 +10,7 @@ int main() {
     Character player("Characters\\Character 9.png");
 
     // NPC (chodzi automatycznie od x = 100 do x = 700)
-    NPC npc("Characters\\Mushroom.png", false, {100.f, 700.f});
+    NPC npc("Characters\\Mushroom.png", false, true);
     npc.setPosition(300.f, 500.f);
 
     // Podłoga
