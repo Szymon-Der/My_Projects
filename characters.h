@@ -50,16 +50,32 @@ protected:
     void setAnimationState(CharacterState newState); //sprawdzanie czy stan sie zmienil wzgedem aktualnego, jesli tak to zmienia set animacji
 };
 
+class Bullet: public sf::CircleShape{
+private:
+    float velocity; //predkosc pocisku
+    bool active; //sprawdzanie czy pocisk jest aktywny, w przyadku kontaktu np. ze sciana zmiana na false i usuniecie
+public:
+    Bullet(float velo, sf::Vector2f startPosition);
+    void update(float dt); //akulaizacja stanu
+    void deactive(); //zmiana active na false
+    void activate();
+    bool getActive();
+};
+
 class NPC : public Character{
 public:
     NPC(const std::string& texturePath, bool isShooting, std::pair<float, float> maxPositions); //wywolanie wraz z przypisaniem plikow z animacjami
     NPC(const std::string& texturePath, bool isShooting, bool isFacingRight);    // konstruktor ktory wywoluje npc ktroy sie nie porusza
     void move(float dt);
+    void shoot(float dt);
+    std::vector<Bullet>& getBullets();
 
 private:
     std::pair<float, float> maxPositions; //pozycje przy koterych npc bedzie zawracał
+    std::vector<Bullet> bullets;
     bool isShooting; //nadanie czy npc bedzie strzelal
-
+    float lastShoot; //czas od ostatniego strzalu
+    float shootCooldown; //czas pomiedzy strzlami
     void loadAnimation();
 };
 

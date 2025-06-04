@@ -34,7 +34,7 @@ LevelMap generateLevel(int levelNumber, const sf::RenderWindow& window) {
 
 bool runLevelGeneric(sf::RenderWindow& window, sf::Font& font) {
     Character player("Characters/Character 9.png");
-    NPC npc("Characters/Mushroom.png", false, {120, 300});
+    NPC npc("Characters/Mushroom.png", true, true);
 
     float groundY = 550.f;
     player.setPosition(100.f, groundY - player.getGlobalBounds().height);
@@ -143,10 +143,32 @@ bool runLevelGeneric(sf::RenderWindow& window, sf::Font& font) {
         npc.move(dt);
         npc.animate(dt);
 
+        // ** Dodaj strzelanie NPC i aktualizację pocisków **
+        npc.shoot(dt);
+
+        auto& bullets = npc.getBullets();
+        for (auto& bullet : bullets) {
+            bullet.update(dt);
+
+            // Przykładowa logika usuwania pocisków po wyjściu z ekranu
+            if (bullet.getPosition().x > window.getSize().x || bullet.getPosition().x < 0) {
+                bullet.deactive();
+            }
+        }
+
+        // Usuwanie nieaktywnych pocisków
+
+
         window.clear(sf::Color(50, 50, 50));
         window.draw(ground);
         window.draw(player);
         window.draw(npc);
+
+        // Rysuj pociski
+        for (auto& bullet : bullets) {
+            window.draw(bullet);
+        }
+
         window.display();
     }
 }

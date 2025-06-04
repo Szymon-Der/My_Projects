@@ -98,14 +98,14 @@ void Character::setGroundContact(bool grounding){
 
 //kostruktor dla pourszajacego sie npc
 NPC::NPC(const std::string& texturePath, bool isShooting, std::pair<float, float> maxPositions) :
-    Character(texturePath), isShooting(isShooting), maxPositions(maxPositions){
+    Character(texturePath), isShooting(isShooting), maxPositions(maxPositions), shootCooldown(10.f), lastShoot(0.f){
     loadAnimation();
     setAnimationState(CharacterState::Run);
     this->moveSpeed = 100.f;
 }
 
 //konstruktor nieporuszajacego sie npc
-NPC::NPC(const std::string& texturePath, bool isShooting, bool isFacingRight): Character(texturePath), isShooting(isShooting){
+NPC::NPC(const std::string& texturePath, bool isShooting, bool isFacingRight): Character(texturePath), isShooting(isShooting), shootCooldown(3.f), lastShoot(0.f){
     loadAnimation();
     setAnimationState(CharacterState::Run);
     this->moveSpeed = 0.f;
@@ -154,9 +154,44 @@ void NPC::move(float dt){
     sf::Sprite::move(velocity * dt);
 }
 
+void NPC::shoot(float dt){
+    lastShoot += dt;
+    if(isShooting && (lastShoot > shootCooldown) && bullets.size() < 10){
+        Bullet newBullet(100.f, this->getPosition());
+        bullets.push_back(newBullet);
+        lastShoot = 0;
+    }
+}
+
 void NPC::loadAnimation(){
     frames[CharacterState::Static] = {{25,31,30,33},{105,31,30,33},{185,31,30,33},{265,31,30,33},{345,31,30,33},{425,31,30,33},{505,31,30,33}};
     frames[CharacterState::Run] = {{25,94,30,33},{105,94,30,33},{185,94,30,33},{265,94,30,33},{345,94,30,33},{425,94,30,33},{505,94,30,33},{585,94,30,33}};
     frames[CharacterState::Jump] = {{25,31,30,33}};
 }
 
+std::vector<Bullet>& NPC::getBullets(){
+    return bullets;
+}
+
+//=======================================
+//---------------BULLET------------------
+//=======================================
+
+Bullet::Bullet(float velo, sf::Vector2f startPosition): sf::CircleShape(10.f), velocity(velo), active(true){
+    setFillColor(sf::Color::Red);
+    setPosition(startPosition);
+}
+
+void Bullet::update(float dt){
+    this->move(velocity*dt,0);
+}
+
+void Bullet::deactive(){
+    active = false;
+}
+void Bullet::activate(){
+    active = true;
+}
+bool Bullet::getActive(){
+    return active;
+}
