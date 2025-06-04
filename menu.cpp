@@ -3,6 +3,7 @@
 #include <fstream>
 #include <algorithm>
 #include <sstream>
+#include <iostream>
 #include <set>
 #include <cctype> // dla toupper i isalnum
 
@@ -12,6 +13,7 @@ Menu::Menu(sf::RenderWindow& window, sf::Font& font)
     loadBackground("Images/bg.jpg");
     m_options = { "Play", "Instructions", "Leaderboard", "Exit" };
     initializeMenu();
+    preloadLevelTextures();
 }
 
 void Menu::loadBackground(const std::string& filePath) {
@@ -88,6 +90,7 @@ void Menu::processEvents() {
                     return;
                 }
                 initializeMenu();
+                preloadLevelTextures();
             }
         }
     }
@@ -398,7 +401,7 @@ void Menu::inputPlayerName() {
                     continue;
                 }
                 std::set<std::string> existing;
-                std::ifstream inFile("players.csv");
+                std::ifstream inFile("csv/players.csv");
                 std::string line;
                 while (std::getline(inFile, line)) {
                     if (line.empty()) continue;
@@ -415,7 +418,7 @@ void Menu::inputPlayerName() {
                 if (existing.find(name) != existing.end()) {
                     messageText.setString("Welcome back, " + name + "!");
                 } else {
-                    std::ofstream outFile("players.csv", std::ios::app);
+                    std::ofstream outFile("csv/players.csv", std::ios::app);
                     outFile << name << "\n";
                     outFile.close();
                     messageText.setString("Nice to meet you, " + name + "! Welcome!");
@@ -481,5 +484,136 @@ void Menu::inputPlayerName() {
     // Jeśli anulowano (ESC), to po prostu powracamy do menu bez wpisanej nazwy
     if (cancelled) {
         m_playerName.clear();
+    }
+}
+
+
+int Menu::selectLevel() {
+    struct LevelData {
+        std::string number;
+        std::string name;
+        std::string textureFile;
+    };
+
+    std::vector<LevelData> levels = {
+        {"1", "EASY",   "Images/level1.png"},
+        {"2", "MEDIUM", "Images/level2.png"},
+        {"3", "HARD",   "Images/level3.png"}
+    };
+
+    std::vector<sf::RectangleShape> boxes;
+    std::vector<sf::Text> numberTexts;
+    std::vector<sf::Text> nameTexts;
+    std::vector<sf::Texture> textures;
+
+    float boxWidth = 200.f;
+    float boxHeight = 200.f;
+    float gap = 80.f;
+    float totalWidth = levels.size() * boxWidth + (levels.size() - 1) * gap;
+    float startX = (m_window.getSize().x - totalWidth) / 2.f;
+    float topY = 200.f;
+
+    int selectedLevel = 0;
+
+    sf::Text header("LEVELS", m_font, 50);
+    header.setFillColor(sf::Color(255, 50, 50));
+    sf::FloatRect hBounds = header.getLocalBounds();
+    header.setPosition((m_window.getSize().x - hBounds.width) / 2.f, 50.f);
+
+    for (size_t i = 0; i < levels.size(); ++i) {
+        sf::RectangleShape box(sf::Vector2f(boxWidth, boxHeight));
+        box.setPosition(startX + i * (boxWidth + gap), topY);
+
+        box.setTexture(&m_levelTextures[i]);
+
+        sf::Text numText(levels[i].number, m_font, 60);
+        numText.setFillColor(sf::Color::Yellow);
+        sf::FloatRect nBounds = numText.getLocalBounds();
+        numText.setPosition(
+            box.getPosition().x + (boxWidth - nBounds.width) / 2.f - nBounds.left,
+            box.getPosition().y + (boxHeight - nBounds.height) / 2.f - nBounds.top
+            );
+
+        sf::Text nameText(levels[i].name, m_font, 28);
+        nameText.setFillColor(sf::Color::White);
+        sf::FloatRect nameBounds = nameText.getLocalBounds();
+        nameText.setPosition(
+            box.getPosition().x + (boxWidth - nameBounds.width) / 2.f - nameBounds.left,
+            box.getPosition().y + boxHeight + 10.f
+            );
+
+        boxes.push_back(box);
+        numberTexts.push_back(numText);
+        nameTexts.push_back(nameText);
+    }
+
+    boxes[selectedLevel].setOutlineThickness(5.f);
+    boxes[selectedLevel].setOutlineColor(sf::Color::Red);
+
+    bool choosing = true;
+    while (m_window.isOpen() && choosing) {
+        sf::Event event;
+        while (m_window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) {
+                m_window.close();
+                return -1;
+            }
+            if (event.type == sf::Event::KeyPressed) {
+                if (event.key.code == sf::Keyboard::Left) {
+                    boxes[selectedLevel].setOutlineThickness(0.f);
+                    selectedLevel = (selectedLevel - 1 + 3) % 3;
+                    boxes[selectedLevel].setOutlineThickness(5.f);
+                    boxes[selectedLevel].setOutlineColor(sf::Color::Red);
+                } else if (event.key.code == sf::Keyboard::Right) {
+                    boxes[selectedLevel].setOutlineThickness(0.f);
+                    selectedLevel = (selectedLevel + 1) % 3;
+                    boxes[selectedLevel].setOutlineThickness(5.f);
+                    boxes[selectedLevel].setOutlineColor(sf::Color::Red);
+                } else if (event.key.code == sf::Keyboard::Enter) {
+                    choosing = false;
+                } else if (event.key.code == sf::Keyboard::Escape) {
+                    return -1;
+                }
+            }
+        }
+
+        m_window.clear();
+        m_window.draw(m_backgroundSprite);
+        m_window.draw(header);
+        for (size_t i = 0; i < boxes.size(); ++i) {
+            m_window.draw(boxes[i]);
+            m_window.draw(numberTexts[i]);
+            m_window.draw(nameTexts[i]);
+        }
+        // Komunikat „ESC to return to menu” na dole ekranu
+        sf::Text footer("Press ESC to return to menu", m_font, 20);
+        footer.setFillColor(sf::Color::White);
+        sf::FloatRect fBounds = footer.getLocalBounds();
+        float fx = (static_cast<float>(m_window.getSize().x) - fBounds.width) / 2.f - fBounds.left;
+        float fy = static_cast<float>(m_window.getSize().y) - fBounds.height - 10.f;
+        footer.setPosition(fx, fy);
+        m_window.draw(footer);
+
+        m_window.display();
+    }
+
+    return selectedLevel + 1;
+}
+
+
+void Menu::preloadLevelTextures() {
+    std::vector<std::string> files = {
+        "Images/level1.jpg", "Images/level2.jpg", "Images/level3.jpg"
+    };
+
+    m_levelTextures.clear();
+    for (const auto& file : files) {
+        sf::Texture tex;
+        if (!tex.loadFromFile(file)) {
+            std::cerr << "Nie można załadować: " << file << std::endl;
+            tex.create(200, 200); // placeholder
+        }
+        tex.setSmooth(true);
+        m_levelTextures.push_back(std::move(tex));
     }
 }

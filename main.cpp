@@ -17,9 +17,17 @@ int main() {
     // Główna pętla aplikacji: za każdym razem pokazujemy menu, a po zakończeniu gry wracamy do menu
     while (window.isOpen()) {
         // 3) Uruchamiamy menu
+    levelSelect:
         Menu menu(window, font);
         bool startGame = menu.run();
+        if (!startGame) {
+            break; // użytkownik wybrał Exit albo zamknął okno
+        }
 
+        int selectedLevel = -1;
+        while (selectedLevel == -1 && window.isOpen()) {
+            selectedLevel = menu.selectLevel(); // lub chooseLevel(), w zależności którą wersję chcesz
+        }
         if (!startGame) {
             // Gracz zamknął okno lub wybrał Exit – kończymy program
             break;
@@ -63,6 +71,7 @@ int main() {
                 // Klawisz Esc: wychodzimy z pętli gry i wracamy do menu
                 if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape) {
                     backToMenu = true;
+                    goto levelSelect;
                 }
             }
 

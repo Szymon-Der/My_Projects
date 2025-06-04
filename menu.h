@@ -14,11 +14,18 @@ public:
     // Główna pętla menu. Zwraca true, jeśli wybrano Play i wpisano nazwę (czyli należy przejść do gry),
     // false jeśli zamknięto/wybrano Exit w menu
     bool run();
+    int chooseLevel();
+    int selectLevel();
 
     // Po wyjściu z run(): jeśli zwrócono true, w main można pobrać nazwę gracza (opcjonalnie)
     const std::string& getPlayerName() const { return m_playerName; }
+    void showProfile();
+    int getGamesPlayed(const std::string& filename, const std::string& playerName);
+    void updateGamesPlayedCSV(const std::string& filename, const std::string& playerName);
 
 private:
+    std::vector<sf::Texture> m_levelTextures;
+    void preloadLevelTextures();
     sf::RenderWindow& m_window;
     sf::Font& m_font;
 
