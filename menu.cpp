@@ -41,11 +41,14 @@ void Menu::initializeMenu() {
 
 bool Menu::run(bool firstRun) {
     if (firstRun && m_playerName.empty()) {
-        inputPlayerName();  // tylko raz po starcie
+        inputPlayerName();
+        if (m_playerName.empty()) {
+            // Użytkownik anulował wpisywanie – zamykamy okno
+            m_window.close();
+            return false;
+        }
     }
-    if (m_playerName.empty()) {
-        inputPlayerName();  // Wpisujemy imię tylko raz – po starcie programu
-    }
+
 
     while (m_window.isOpen()) {
         processEvents();
@@ -481,7 +484,7 @@ void Menu::inputPlayerName() {
         messageText.setPosition(mX, mY);
 
         // Komunikat „ESC to exit” na dole ekranu
-        sf::Text footer("Press ESC to return to menu", m_font, 20);
+        sf::Text footer("Press ESC to exit", m_font, 20);
         footer.setFillColor(sf::Color::White);
         sf::FloatRect fBounds = footer.getLocalBounds();
         float fX = (winW - fBounds.width) / 2.f - fBounds.left;
