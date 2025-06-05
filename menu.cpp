@@ -1,5 +1,7 @@
 // menu.cpp
 #include "menu.h"
+#include "levels.h"
+#include "characters.h"
 #include <fstream>
 #include <algorithm>
 #include <sstream>

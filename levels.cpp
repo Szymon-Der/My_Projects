@@ -1,5 +1,9 @@
 #include "levels.h"
 #include "characters.h"
+#include "timer.h"
+#include <SFML/Graphics.hpp>
+#include <iostream>
+
 
 LevelMap generateLevel(int levelNumber, const sf::RenderWindow& window) {
     LevelMap level;
@@ -32,9 +36,9 @@ LevelMap generateLevel(int levelNumber, const sf::RenderWindow& window) {
     return level;
 }
 
-bool runLevelGeneric(sf::RenderWindow& window, sf::Font& font, const sf::Texture& backgroundTexture) {
+bool runLevelGeneric(sf::RenderWindow& window, sf::Font& font, const sf::Texture& bgTexture) {
     Character player("Characters/Character 9.png");
-    NPC npc("Characters/Mushroom.png", true, true);
+    NPC npc("Characters/Mushroom.png", false, {120, 300});
 
     float groundY = 550.f;
     player.setPosition(100.f, groundY - player.getGlobalBounds().height);
@@ -44,28 +48,20 @@ bool runLevelGeneric(sf::RenderWindow& window, sf::Font& font, const sf::Texture
     ground.setFillColor(sf::Color(100, 250, 50));
     ground.setPosition(0.f, groundY);
 
+    sf::Sprite background(bgTexture);
+    float scaleX = window.getSize().x / bgTexture.getSize().x;
+    float scaleY = window.getSize().y / bgTexture.getSize().y;
+    background.setScale(scaleX, scaleY);
+
+    Timer timer(2 * 60); // 2 minuty
+
+
+
     sf::Clock clock;
     bool backToMenu = false;
     bool paused = false;
-    int pauseOption = 0; // 0 = Resume, 1 = Exit
+    int pauseOption = 0;
 
-    // Tło z menu (skalowane)
-    sf::Sprite background(backgroundTexture);
-    float w = background.getLocalBounds().width;
-    float h = background.getLocalBounds().height;
-
-    if (w > 0 && h > 0) {
-        float scaleX = window.getSize().x / w;
-        float scaleY = window.getSize().y / h;
-        background.setScale(scaleX, scaleY);
-    } else {
-        std::cerr << "Błąd: przekazana tekstura tła ma zerowy rozmiar!" << std::endl;
-    }
-
-
-
-
-    // Okno pauzy
     sf::RectangleShape pauseBox(sf::Vector2f(300, 150));
     pauseBox.setFillColor(sf::Color(0, 0, 0, 200));
     pauseBox.setOutlineColor(sf::Color::White);
@@ -86,24 +82,27 @@ bool runLevelGeneric(sf::RenderWindow& window, sf::Font& font, const sf::Texture
         sf::Event event;
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) window.close();
-            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape) paused = !paused;
+            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape && !paused) {
+                paused = true;
+                timer.pause();
+            }
 
             if (paused && event.type == sf::Event::KeyPressed) {
                 if (event.key.code == sf::Keyboard::Up || event.key.code == sf::Keyboard::Down)
-                    pauseOption = 1 - pauseOption; // przełączanie opcji
+                    pauseOption = 1 - pauseOption;
                 if (event.key.code == sf::Keyboard::Enter) {
-                    if (pauseOption == 0) paused = false; // Resume
-                    else if (pauseOption == 1) return false; // Exit
+                    if (pauseOption == 0) {
+                        paused = false;
+                        timer.resume();
+                    }
+                    else if (pauseOption == 1) backToMenu = true;
                 }
             }
         }
 
         if (paused) {
             window.clear();
-            if (backgroundTexture.getSize().x > 0) {
-                window.draw(background);
-            }
-
+            window.draw(background);
             window.draw(pauseBox);
             resumeText.setFillColor(pauseOption == 0 ? sf::Color::Yellow : sf::Color::White);
             exitText.setFillColor(pauseOption == 1 ? sf::Color::Yellow : sf::Color::White);
@@ -113,7 +112,7 @@ bool runLevelGeneric(sf::RenderWindow& window, sf::Font& font, const sf::Texture
             continue;
         }
 
-        // Normalna rozgrywka
+        // Sterowanie i fizyka
         int horizontal = 0;
         bool jump = false;
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) horizontal = -1;
@@ -134,34 +133,23 @@ bool runLevelGeneric(sf::RenderWindow& window, sf::Font& font, const sf::Texture
         npc.move(dt);
         npc.animate(dt);
 
-        // ** Dodaj strzelanie NPC i aktualizację pocisków **
-        npc.shoot(dt);
-
-        auto& bullets = npc.getBullets();
-        for (auto& bullet : bullets) {
-            bullet.update(dt);
-
-            // Przykładowa logika usuwania pocisków po wyjściu z ekranu
-            if (bullet.getPosition().x > window.getSize().x || bullet.getPosition().x < 0) {
-                bullet.deactive();
-            }
-        }
-
-        // Usuwanie nieaktywnych pocisków
-
-
         window.clear(sf::Color(50, 50, 50));
+        window.draw(background);
         window.draw(ground);
         window.draw(player);
         window.draw(npc);
-
-        // Rysuj pociski
-        for (auto& bullet : bullets) {
-            window.draw(bullet);
-        }
+        sf::Text timerText;
+        timerText.setFont(font);
+        timerText.setCharacterSize(24);
+        timerText.setFillColor(sf::Color::White);
+        timerText.setString(timer.getFormattedTime());
+        timerText.setPosition(window.getSize().x - 140.f, 10.f);
+        window.draw(timerText);
 
         window.display();
     }
+
+    return true; // true: wróć do wyboru levelu
 }
 
 
