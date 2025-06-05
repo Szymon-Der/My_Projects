@@ -90,7 +90,6 @@ void Menu::processEvents() {
                     return;
                 }
                 initializeMenu();
-                preloadLevelTextures();
             }
         }
     }
@@ -551,6 +550,8 @@ int Menu::selectLevel() {
     boxes[selectedLevel].setOutlineColor(sf::Color::Red);
 
     bool choosing = true;
+    bool aborted = false;
+
     while (m_window.isOpen() && choosing) {
         sf::Event event;
         while (m_window.pollEvent(event)) {
@@ -572,7 +573,8 @@ int Menu::selectLevel() {
                 } else if (event.key.code == sf::Keyboard::Enter) {
                     choosing = false;
                 } else if (event.key.code == sf::Keyboard::Escape) {
-                    return -1;
+                    aborted = true;
+                    choosing = false;
                 }
             }
         }
@@ -596,6 +598,8 @@ int Menu::selectLevel() {
 
         m_window.display();
     }
+
+    if (aborted) return -1;
 
     return selectedLevel + 1;
 }

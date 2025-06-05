@@ -32,7 +32,7 @@ LevelMap generateLevel(int levelNumber, const sf::RenderWindow& window) {
     return level;
 }
 
-bool runLevelGeneric(sf::RenderWindow& window, sf::Font& font) {
+bool runLevelGeneric(sf::RenderWindow& window, sf::Font& font, const sf::Texture& backgroundTexture) {
     Character player("Characters/Character 9.png");
     NPC npc("Characters/Mushroom.png", true, true);
 
@@ -50,27 +50,18 @@ bool runLevelGeneric(sf::RenderWindow& window, sf::Font& font) {
     int pauseOption = 0; // 0 = Resume, 1 = Exit
 
     // Tło z menu (skalowane)
-    sf::Texture backgroundTexture;
-    sf::Sprite background;
-    bool hasBackground = false;
+    sf::Sprite background(backgroundTexture);
+    float w = background.getLocalBounds().width;
+    float h = background.getLocalBounds().height;
 
-    if (backgroundTexture.loadFromFile("Images/bg.jpg")) {
-        hasBackground = true;
-        background.setTexture(backgroundTexture);
-        float w = background.getLocalBounds().width;
-        float h = background.getLocalBounds().height;
-        if (w > 0 && h > 0) {
-            background.setScale(
-                window.getSize().x / w,
-                window.getSize().y / h
-                );
-        } else {
-            hasBackground = false;
-            std::cerr << "Tło ma zerowe wymiary." << std::endl;
-        }
+    if (w > 0 && h > 0) {
+        float scaleX = window.getSize().x / w;
+        float scaleY = window.getSize().y / h;
+        background.setScale(scaleX, scaleY);
     } else {
-        std::cerr << "Nie można załadować Images/bg.jpg" << std::endl;
+        std::cerr << "Błąd: przekazana tekstura tła ma zerowy rozmiar!" << std::endl;
     }
+
 
 
 
@@ -175,7 +166,16 @@ bool runLevelGeneric(sf::RenderWindow& window, sf::Font& font) {
 
 
 
-bool runLevel1(sf::RenderWindow& window, sf::Font& font) { return runLevelGeneric(window, font); }
-bool runLevel2(sf::RenderWindow& window, sf::Font& font) { return runLevelGeneric(window, font); }
-bool runLevel3(sf::RenderWindow& window, sf::Font& font) { return runLevelGeneric(window, font); }
+bool runLevel1(sf::RenderWindow& window, sf::Font& font, const sf::Texture& bg) {
+    return runLevelGeneric(window, font, bg);
+}
+
+bool runLevel2(sf::RenderWindow& window, sf::Font& font, const sf::Texture& bg) {
+    return runLevelGeneric(window, font, bg);
+}
+
+bool runLevel3(sf::RenderWindow& window, sf::Font& font, const sf::Texture& bg) {
+    return runLevelGeneric(window, font, bg);
+}
+
 
