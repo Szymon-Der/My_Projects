@@ -129,7 +129,7 @@ void Menu::render() {
     }
 
     // Na dole ekranu: informacja o Enter
-    sf::Text footer("Press Enter to select/confirm options", m_font, 20);
+    sf::Text footer("Press Enter to select", m_font, 20);
     footer.setFillColor(sf::Color::White);
     sf::FloatRect fBounds = footer.getLocalBounds();
     float fx = (static_cast<float>(m_window.getSize().x) - fBounds.width) / 2.f - fBounds.left;
