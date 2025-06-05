@@ -192,6 +192,6 @@ void Bullet::deactive(){
 void Bullet::activate(){
     active = true;
 }
-bool Bullet::getActive(){
+bool Bullet::getActive() const {
     return active;
 }

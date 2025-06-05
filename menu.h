@@ -13,7 +13,8 @@ public:
 
     // Główna pętla menu. Zwraca true, jeśli wybrano Play i wpisano nazwę (czyli należy przejść do gry),
     // false jeśli zamknięto/wybrano Exit w menu
-    bool run();
+    bool run(bool firstRun = false); // domyślnie false
+
     int chooseLevel();
     int selectLevel();
 

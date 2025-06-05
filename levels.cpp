@@ -38,7 +38,7 @@ LevelMap generateLevel(int levelNumber, const sf::RenderWindow& window) {
 
 bool runLevelGeneric(sf::RenderWindow& window, sf::Font& font, const sf::Texture& bgTexture) {
     Character player("Characters/Character 9.png");
-    NPC npc("Characters/Mushroom.png", false, {120, 300});
+    NPC npc("Characters/Mushroom.png", true, false);
 
     float groundY = 550.f;
     player.setPosition(100.f, groundY - player.getGlobalBounds().height);
@@ -48,14 +48,20 @@ bool runLevelGeneric(sf::RenderWindow& window, sf::Font& font, const sf::Texture
     ground.setFillColor(sf::Color(100, 250, 50));
     ground.setPosition(0.f, groundY);
 
-    sf::Sprite background(bgTexture);
-    float scaleX = window.getSize().x / bgTexture.getSize().x;
-    float scaleY = window.getSize().y / bgTexture.getSize().y;
-    background.setScale(scaleX, scaleY);
+    sf::RectangleShape sky(sf::Vector2f(static_cast<float>(window.getSize().x), static_cast<float>(window.getSize().y)));
+    sky.setFillColor(sf::Color(135, 206, 235)); // Jasnoniebieskie niebo
 
-    Timer timer(2 * 60); // 2 minuty
+    sf::Sprite background;
+    if (bgTexture.getSize().x > 0 && bgTexture.getSize().y > 0) {
+        background.setTexture(bgTexture);
+        float scaleX = window.getSize().x / static_cast<float>(bgTexture.getSize().x);
+        float scaleY = window.getSize().y / static_cast<float>(bgTexture.getSize().y);
+        background.setScale(scaleX, scaleY);
+    } else {
+        std::cerr << "Tło ma zerowy rozmiar!" << std::endl;
+    }
 
-
+    Timer timer(20); // 2 minuty
 
     sf::Clock clock;
     bool backToMenu = false;
@@ -94,20 +100,21 @@ bool runLevelGeneric(sf::RenderWindow& window, sf::Font& font, const sf::Texture
                     if (pauseOption == 0) {
                         paused = false;
                         timer.resume();
-                    }
-                    else if (pauseOption == 1) backToMenu = true;
+                    } else if (pauseOption == 1) backToMenu = true;
                 }
             }
         }
 
         if (paused) {
             window.clear();
-            window.draw(background);
+            window.draw(background); // Tło z bg.jpg podczas pauzy
+
             window.draw(pauseBox);
             resumeText.setFillColor(pauseOption == 0 ? sf::Color::Yellow : sf::Color::White);
             exitText.setFillColor(pauseOption == 1 ? sf::Color::Yellow : sf::Color::White);
             window.draw(resumeText);
             window.draw(exitText);
+
             window.display();
             continue;
         }
@@ -133,11 +140,40 @@ bool runLevelGeneric(sf::RenderWindow& window, sf::Font& font, const sf::Texture
         npc.move(dt);
         npc.animate(dt);
 
-        window.clear(sf::Color(50, 50, 50));
-        window.draw(background);
-        window.draw(ground);
+        // Dodaj pocisk ręcznie
+        static float shootTimer = 0.f;
+        shootTimer += dt;
+        if (shootTimer > 3.f && npc.getBullets().size() < 10) {
+            Bullet newBullet(100.f, npc.getPosition()); // zawsze w prawo
+            npc.getBullets().push_back(newBullet);
+            shootTimer = 0.f;
+        }
+
+        auto& bullets = npc.getBullets();
+        for (auto& bullet : bullets) {
+            bullet.update(dt);
+            if (bullet.getPosition().x > window.getSize().x || bullet.getPosition().x < 0) {
+                bullet.deactive();
+            }
+        }
+
+        bullets.erase(
+            std::remove_if(bullets.begin(), bullets.end(),
+                           [](const Bullet& b) { return !b.getActive(); }),
+            bullets.end());
+
+        window.clear();
+        window.draw(sky);      // niebo w czasie gry
+        window.draw(ground);   // trawa
         window.draw(player);
         window.draw(npc);
+
+        for (const Bullet& bullet : npc.getBullets()) {
+            if (bullet.getActive()) {
+                window.draw(bullet);
+            }
+        }
+
         sf::Text timerText;
         timerText.setFont(font);
         timerText.setCharacterSize(24);
@@ -149,8 +185,9 @@ bool runLevelGeneric(sf::RenderWindow& window, sf::Font& font, const sf::Texture
         window.display();
     }
 
-    return true; // true: wróć do wyboru levelu
+    return !backToMenu;
 }
+
 
 
 

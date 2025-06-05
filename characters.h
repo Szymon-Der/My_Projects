@@ -59,7 +59,7 @@ public:
     void update(float dt); //akulaizacja stanu
     void deactive(); //zmiana active na false
     void activate();
-    bool getActive();
+    bool getActive() const;
 };
 
 class NPC : public Character{

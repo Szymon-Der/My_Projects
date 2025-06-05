@@ -39,18 +39,29 @@ void Menu::initializeMenu() {
     }
 }
 
-bool Menu::run() {
+bool Menu::run(bool firstRun) {
+    if (firstRun && m_playerName.empty()) {
+        inputPlayerName();  // tylko raz po starcie
+    }
+    if (m_playerName.empty()) {
+        inputPlayerName();  // Wpisujemy imię tylko raz – po starcie programu
+    }
+
     while (m_window.isOpen()) {
         processEvents();
+
         if (m_startGame) {
-            // Użytkownik wpisał nazwę i nie anulował – wyjście z menu, przejście do gry
+            // Przechodzimy do wyboru poziomu
             return true;
         }
-        render();
+
+        render(); // Rysowanie menu i ewentualnie imienia gracza w rogu
     }
-    // Jeśli okno zostało zamknięte lub wybrano Exit, kończymy bez uruchamiania gry
+
+    // Zamknięto okno lub wybrano Exit
     return false;
 }
+
 
 void Menu::processEvents() {
     sf::Event event;
@@ -72,15 +83,12 @@ void Menu::processEvents() {
             }
             else if (event.key.code == sf::Keyboard::Enter) {
                 const std::string& choice = m_options[m_selected];
+
                 if (choice == "Play") {
-                    inputPlayerName();
-                    // Jeśli użytkownik nie anulował wpisywania (ESC), to rozpoczynamy grę
-                    if (!m_playerName.empty()) {
-                        m_startGame = true;
-                        return;
-                    }
-                    // Jeśli anulował, wracamy do menu i resetujemy zaznaczenie
+                    m_startGame = true;
+                    return;
                 }
+
                 else if (choice == "Instructions") {
                     showInstructions();
                 }
@@ -91,8 +99,10 @@ void Menu::processEvents() {
                     m_window.close();
                     return;
                 }
-                initializeMenu();
+
+                initializeMenu(); // resetujemy zaznaczenie
             }
+
         }
     }
 }
@@ -126,6 +136,16 @@ void Menu::render() {
     float fy = static_cast<float>(m_window.getSize().y) - fBounds.height - 10.f;
     footer.setPosition(fx, fy);
     m_window.draw(footer);
+    if (!m_playerName.empty()) {
+        sf::Text nameText(m_playerName, m_font, 28);
+        nameText.setFillColor(sf::Color::Yellow);
+        sf::FloatRect bounds = nameText.getLocalBounds();
+        nameText.setPosition(
+            m_window.getSize().x - bounds.width - 20.f,
+            10.f
+            );
+        m_window.draw(nameText);
+    }
 
     m_window.display();
 }
@@ -597,13 +617,27 @@ int Menu::selectLevel() {
         float fy = static_cast<float>(m_window.getSize().y) - fBounds.height - 10.f;
         footer.setPosition(fx, fy);
         m_window.draw(footer);
+        // Wyświetlanie nazwy gracza w prawym górnym rogu
+        sf::Text nameText(m_playerName, m_font, 28);
+        nameText.setFillColor(sf::Color::Yellow);
+        sf::FloatRect nBounds = nameText.getLocalBounds();
+        nameText.setPosition(
+            m_window.getSize().x - nBounds.width - 20.f,
+            10.f
+            );
+        m_window.draw(nameText);
+
 
         m_window.display();
     }
 
-    if (aborted) return -1;
+    if (aborted) {
+        m_startGame = false;  // resetujemy flagę, żeby nie przejść do gry
+        return -1;
+    }
 
     return selectedLevel + 1;
+
 }
 
 
