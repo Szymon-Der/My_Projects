@@ -33,9 +33,9 @@ int main() {
             bool goBackToLevelSelect = false;
 
             switch (selectedLevel) {
-            case 1: goBackToLevelSelect = runLevel1(window, font, bg); break;
-            case 2: goBackToLevelSelect = runLevel2(window, font, bg); break;
-            case 3: goBackToLevelSelect = runLevel3(window, font, bg); break;
+            case 1: goBackToLevelSelect = runLevel1(window, font); break;
+            case 2: goBackToLevelSelect = runLevel2(window, font); break;
+            case 3: goBackToLevelSelect = runLevel3(window, font); break;
             default: break;
             }
 

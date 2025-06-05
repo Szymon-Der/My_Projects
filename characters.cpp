@@ -16,6 +16,8 @@ Character::Character(const std::string& texturePath) :
     loadAnimation();
     setTextureRect(frames[currentState][frameIndex]);
     setPosition(100.f,100.f);
+    setScale(1.5f,1.5f);
+    setOrigin(getLocalBounds().width / 2.f, 0.f);
 }
 
 //zaladowanie miejsc poszczegolnych klatek w pliku
@@ -42,13 +44,13 @@ void Character::move(int horizontalDirection, bool jump, float dt){
     //obrot w lewo i prawo w zalezonosci od ruchu
     if(horizontalDirection > 0){
         facingRight = true;
-        setScale(1.f, 1.f);
-        setOrigin(getGlobalBounds().width, 0);
+        setScale(1.5f, 1.5f);
+        //setOrigin(getGlobalBounds().width, 0);
     }
     else if(horizontalDirection < 0){
         facingRight = false;
-        setScale(-1.f,1.f);
-        setOrigin(0,0);
+        setScale(-1.5f,1.5f);
+        //setOrigin(0,0);
     }
 
     //skok
@@ -98,10 +100,12 @@ void Character::setGroundContact(bool grounding){
 
 //kostruktor dla pourszajacego sie npc
 NPC::NPC(const std::string& texturePath, bool isShooting, std::pair<float, float> maxPositions) :
-    Character(texturePath), isShooting(isShooting), maxPositions(maxPositions), shootCooldown(10.f), lastShoot(0.f){
+    Character(texturePath), isShooting(isShooting), maxPositions(maxPositions), shootCooldown(4.f), lastShoot(0.f){
     loadAnimation();
     setAnimationState(CharacterState::Run);
     this->moveSpeed = 100.f;
+    setScale(1.5f,1.5f);
+    setOrigin(getLocalBounds().width / 2.f, 0.f);
 }
 
 //konstruktor nieporuszajacego sie npc
@@ -110,13 +114,12 @@ NPC::NPC(const std::string& texturePath, bool isShooting, bool isFacingRight): C
     setAnimationState(CharacterState::Run);
     this->moveSpeed = 0.f;
     this->facingRight = isFacingRight;
+    setOrigin(getLocalBounds().width / 2.f, 0.f);
     if(!isFacingRight){
-        setScale(1.f, 1.f);
-        setOrigin(getGlobalBounds().width, 0);
+        setScale(1.5f, 1.5f);
     }
     else{
-        setScale(-1.f, 1.f);
-        setOrigin(0, 0);
+        setScale(-1.5f, 1.5f);
     }
 }
 
@@ -137,12 +140,10 @@ void NPC::move(float dt){
 
     if (facingRight) {
         velocity.x = moveSpeed;
-        setScale(-1.f, 1.f);
-        setOrigin(0, 0);
+        setScale(-1.5f, 1.5f);
     } else {
         velocity.x = -moveSpeed;
-        setScale(1.f, 1.f);
-        setOrigin(getGlobalBounds().width, 0);
+        setScale(1.5f, 1.5f);
     }
 
     if(!isOnGround){
@@ -156,9 +157,15 @@ void NPC::move(float dt){
 
 void NPC::shoot(float dt){
     lastShoot += dt;
-    if(isShooting && (lastShoot > shootCooldown) && bullets.size() < 10){
-        Bullet newBullet(100.f, this->getPosition());
-        bullets.push_back(newBullet);
+    if(isShooting && lastShoot > shootCooldown){
+        if(!facingRight){
+            Bullet newBullet(-150.f, {this->getPosition().x-this->getGlobalBounds().width, this->getPosition().y + this->getGlobalBounds().height / 2});
+            bullets.push_back(newBullet);
+        }
+        else{
+            Bullet newBullet(150.f, {this->getPosition().x, this->getPosition().y + this->getGlobalBounds().height / 2});
+            bullets.push_back(newBullet);
+        }
         lastShoot = 0;
     }
 }
@@ -177,8 +184,10 @@ std::vector<Bullet>& NPC::getBullets(){
 //---------------BULLET------------------
 //=======================================
 
-Bullet::Bullet(float velo, sf::Vector2f startPosition): sf::CircleShape(10.f), velocity(velo), active(true){
+Bullet::Bullet(float velo, sf::Vector2f startPosition): sf::CircleShape(6.f), velocity(velo), active(true){
     setFillColor(sf::Color::Red);
+    setOutlineColor(sf::Color::Black);
+    setOutlineThickness(2.f);
     setPosition(startPosition);
 }
 

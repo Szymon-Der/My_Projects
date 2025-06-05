@@ -10,10 +10,10 @@ struct LevelMap {
 };
 
 LevelMap generateLevel(int levelNumber, const sf::RenderWindow& window);
-bool runLevel1(sf::RenderWindow& window, sf::Font& font, const sf::Texture& bg);
-bool runLevel2(sf::RenderWindow& window, sf::Font& font, const sf::Texture& bg);
-bool runLevel3(sf::RenderWindow& window, sf::Font& font, const sf::Texture& bg);
-bool runLevelGeneric(sf::RenderWindow& window, sf::Font& font, const sf::Texture& backgroundTexture);
+bool runLevel1(sf::RenderWindow& window, sf::Font& font);
+bool runLevel2(sf::RenderWindow& window, sf::Font& font);
+bool runLevel3(sf::RenderWindow& window, sf::Font& font);
+//bool runLevelGeneric(sf::RenderWindow& window, sf::Font& font, const sf::Texture& backgroundTexture);
 
 
 #endif

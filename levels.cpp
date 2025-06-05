@@ -37,69 +37,50 @@ LevelMap generateLevel(int levelNumber, const sf::RenderWindow& window) {
     return level;
 }
 
-bool runLevelGeneric(sf::RenderWindow& window, sf::Font& font, const sf::Texture& bgTexture) {
+bool runLevel1(sf::RenderWindow& window, sf::Font& font) {
+    //generowanie postaci
     Character player("Characters/Character 9.png");
-    NPC npc("Characters/Mushroom.png", true, false);
+    Character player2("Characters/Character 1.png");
+    NPC npc("Characters/Mushroom.png", true, std::make_pair(300.f, 800.f));
 
+    //ustawienie tymczasowej platformy
     float groundY = 550.f;
     player.setPosition(100.f, groundY - player.getGlobalBounds().height);
+    player2.setPosition(100.f, groundY - player2.getGlobalBounds().height);
     npc.setPosition(300.f, groundY - npc.getGlobalBounds().height);
 
     sf::RectangleShape ground(sf::Vector2f(static_cast<float>(window.getSize().x), 170.f));
-    ground.setFillColor(sf::Color(100, 250, 50));
+    ground.setFillColor(sf::Color(100, 250, 50,128));
     ground.setPosition(0.f, groundY);
-
-    sf::RectangleShape sky(sf::Vector2f(static_cast<float>(window.getSize().x), static_cast<float>(window.getSize().y)));
-    sky.setFillColor(sf::Color(135, 206, 235)); // Jasnoniebieskie niebo
-
-    sf::Sprite background;
-    if (bgTexture.getSize().x > 0 && bgTexture.getSize().y > 0) {
-        background.setTexture(bgTexture);
-        float scaleX = window.getSize().x / static_cast<float>(bgTexture.getSize().x);
-        float scaleY = window.getSize().y / static_cast<float>(bgTexture.getSize().y);
-        background.setScale(scaleX, scaleY);
-    } else {
-        std::cerr << "Tło ma zerowy rozmiar!" << std::endl;
-    }
-
-    Timer timer(20); // 20 sekund
-
-    // Dźwięk beep
-    sf::SoundBuffer beepBuffer;
-    beepBuffer.loadFromFile("Sounds/beep.wav");
-    sf::Sound beepSound(beepBuffer);
-
-    // Dźwięk game over
-    sf::SoundBuffer gameOverBuffer;
-    gameOverBuffer.loadFromFile("Sounds/gameover.wav");
-    sf::Sound gameOverSound(gameOverBuffer);
-
-    int lastSecond = timer.getFormattedTime() == "00:00" ? 0 : std::stoi(timer.getFormattedTime().substr(3));
-    bool gameOverPlayed = false;
-
-    sf::Text gameOverText;
-    gameOverText.setFont(font);
-    gameOverText.setCharacterSize(80);
-    gameOverText.setFillColor(sf::Color::Red);
-    gameOverText.setString("GAME OVER");
-    sf::FloatRect textBounds = gameOverText.getLocalBounds();
-    gameOverText.setOrigin(textBounds.width / 2, textBounds.height / 2);
-    gameOverText.setPosition(window.getSize().x / 2.f, window.getSize().y / 2.f);
-
-    sf::Text exitHintText;
-    exitHintText.setFont(font);
-    exitHintText.setCharacterSize(28);
-    exitHintText.setFillColor(sf::Color::White);
-    exitHintText.setString("Press ESC to return to levels");
-    sf::FloatRect hintBounds = exitHintText.getLocalBounds();
-    exitHintText.setOrigin(hintBounds.width / 2, hintBounds.height / 2);
-    exitHintText.setPosition(window.getSize().x / 2.f, window.getSize().y - 80.f);
-
 
     sf::Clock clock;
     bool backToMenu = false;
     bool paused = false;
     int pauseOption = 0;
+
+
+    //sekwencja wczytania tla dla akutalnego lvl
+    sf::Texture backgroundTexture;
+    sf::Sprite background;
+    bool hasBackground = false;
+
+    if (backgroundTexture.loadFromFile("Levels_textures\\Background.png")) {
+        hasBackground = true;
+        background.setTexture(backgroundTexture);
+        float w = background.getLocalBounds().width;
+        float h = background.getLocalBounds().height;
+        if (w > 0 && h > 0) {
+            background.setScale(
+                window.getSize().x / w,
+                window.getSize().y / h
+                );
+        } else {
+            hasBackground = false;
+            std::cerr << "Tło ma zerowe wymiary." << std::endl;
+        }
+    } else {
+        std::cerr << "Nie można załadować Images/bg.jpg" << std::endl;
+    }
 
     sf::RectangleShape pauseBox(sf::Vector2f(300, 150));
     pauseBox.setFillColor(sf::Color(0, 0, 0, 200));
@@ -115,52 +96,32 @@ bool runLevelGeneric(sf::RenderWindow& window, sf::Font& font, const sf::Texture
     resumeText.setPosition(pauseBox.getPosition().x + 90, pauseBox.getPosition().y + 30);
     exitText.setPosition(pauseBox.getPosition().x + 110, pauseBox.getPosition().y + 80);
 
+
+    //petla lvl1
     while (window.isOpen() && !backToMenu) {
         float dt = clock.restart().asSeconds();
 
         sf::Event event;
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) window.close();
-            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape) {
-                if (timer.getFormattedTime() == "00:00") {
-                    backToMenu = true; // jeśli czas się skończył → wyjście do menu
-                } else if (!paused) {
-                    paused = true;
-                    timer.pause();
-                }
-            }
-
+            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape) paused = !paused;
 
             if (paused && event.type == sf::Event::KeyPressed) {
                 if (event.key.code == sf::Keyboard::Up || event.key.code == sf::Keyboard::Down)
                     pauseOption = 1 - pauseOption;
                 if (event.key.code == sf::Keyboard::Enter) {
-                    if (pauseOption == 0) {
-                        paused = false;
-                        timer.resume();
-                    } else if (pauseOption == 1) backToMenu = true;
+                    if (pauseOption == 0) paused = false;
+                    else if (pauseOption == 1) return false;
                 }
             }
         }
 
-        int remainingSeconds = 0;
-        try {
-            remainingSeconds = std::stoi(timer.getFormattedTime().substr(3));
-        } catch (...) {}
-
-        if (remainingSeconds != lastSecond) {
-            if (remainingSeconds <= 10 && remainingSeconds > 0) {
-                beepSound.play();
-            } else if (remainingSeconds == 0 && !gameOverPlayed) {
-                gameOverSound.play();
-                gameOverPlayed = true;
-            }
-            lastSecond = remainingSeconds;
-        }
-
         if (paused) {
             window.clear();
-            window.draw(background); // Tło z bg.jpg podczas pauzy
+            if (backgroundTexture.getSize().x > 0) {
+                window.draw(background);
+            }
+
             window.draw(pauseBox);
             resumeText.setFillColor(pauseOption == 0 ? sf::Color::Yellow : sf::Color::White);
             exitText.setFillColor(pauseOption == 1 ? sf::Color::Yellow : sf::Color::White);
@@ -170,13 +131,28 @@ bool runLevelGeneric(sf::RenderWindow& window, sf::Font& font, const sf::Texture
             continue;
         }
 
-        // Sterowanie i fizyka
-        int horizontal = 0;
-        bool jump = false;
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) horizontal = -1;
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) horizontal = 1;
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) jump = true;
 
+        //contorlsy dla player
+        int horizontalPlayer1 = 0;
+        bool jumpPlayer1 = false;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) horizontalPlayer1 = -1;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) horizontalPlayer1 = 1;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) jumpPlayer1 = true;
+
+        //controlsy dla player2
+        int horizontalPlayer2 = 0;
+        bool jumpPlayer2 = false;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) horizontalPlayer2 = -1;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) horizontalPlayer2 = 1;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) jumpPlayer2 = true;
+
+        //aktulizacja stany player1
+        player.update(horizontalPlayer1, jumpPlayer1, dt);
+
+        //atulaizacja stany player2
+        player2.update(horizontalPlayer2, jumpPlayer2, dt);
+
+        //kontakt z podlozem dla player 1
         if (player.getPosition().y + player.getGlobalBounds().height >= groundY) {
             player.setPosition(player.getPosition().x, groundY - player.getGlobalBounds().height);
             player.setGroundContact(true);
@@ -187,74 +163,57 @@ bool runLevelGeneric(sf::RenderWindow& window, sf::Font& font, const sf::Texture
             npc.setGroundContact(true);
         } else npc.setGroundContact(false);
 
-        player.update(horizontal, jump, dt);
+        // kontakt z podłożem dla player 2
+        if (player2.getPosition().y + player2.getGlobalBounds().height >= groundY) {
+            player2.setPosition(player2.getPosition().x, groundY - player2.getGlobalBounds().height);
+            player2.setGroundContact(true);
+        }
+        else {
+            player2.setGroundContact(false);
+        }
+
+
+        //aktualizacja stanu NPC
         npc.move(dt);
         npc.animate(dt);
-
-        // Strzały NPC
-        static float shootTimer = 0.f;
-        shootTimer += dt;
-        if (shootTimer > 3.f && npc.getBullets().size() < 10) {
-            Bullet newBullet(100.f, npc.getPosition()); // zawsze w prawo
-            npc.getBullets().push_back(newBullet);
-            shootTimer = 0.f;
-        }
+        npc.shoot(dt);
 
         auto& bullets = npc.getBullets();
         for (auto& bullet : bullets) {
             bullet.update(dt);
-            if (bullet.getPosition().x > window.getSize().x || bullet.getPosition().x < 0)
+            if (bullet.getPosition().x > window.getSize().x || bullet.getPosition().x < 0) {
                 bullet.deactive();
+            }
         }
 
-        bullets.erase(std::remove_if(bullets.begin(), bullets.end(),
-                                     [](const Bullet& b) { return !b.getActive(); }),
-                      bullets.end());
+        bullets.erase(
+            std::remove_if(bullets.begin(), bullets.end(), [](const Bullet& b) {
+                return !b.getActive();
+            }),
+            bullets.end()
+            );
 
-        window.clear();
-        window.draw(sky);      // niebo w czasie gry
-        window.draw(ground);   // trawa
+        window.clear(sf::Color(50, 50, 50));
+        if (hasBackground) window.draw(background);
+        window.draw(ground);
         window.draw(player);
+        window.draw(player2);
         window.draw(npc);
-
-        for (const Bullet& bullet : npc.getBullets()) {
-            if (bullet.getActive()) window.draw(bullet);
+        for (auto& bullet : bullets) {
+            window.draw(bullet);
         }
-
-        // Zegar
-        sf::Text timerText;
-        timerText.setFont(font);
-        timerText.setCharacterSize(24);
-        timerText.setFillColor(sf::Color::White);
-        timerText.setString(timer.getFormattedTime());
-        timerText.setPosition(window.getSize().x - 140.f, 10.f);
-        window.draw(timerText);
-
-        if (remainingSeconds == 0) {
-            window.draw(gameOverText);
-            window.draw(exitHintText);
-        }
-
         window.display();
     }
 
-    return !backToMenu;
+    return true;
 }
 
-
-
-
-
-bool runLevel1(sf::RenderWindow& window, sf::Font& font, const sf::Texture& bg) {
-    return runLevelGeneric(window, font, bg);
+bool runLevel2(sf::RenderWindow& window, sf::Font& font) {
+    return runLevel1(window, font); // tymczasowo
 }
 
-bool runLevel2(sf::RenderWindow& window, sf::Font& font, const sf::Texture& bg) {
-    return runLevelGeneric(window, font, bg);
-}
-
-bool runLevel3(sf::RenderWindow& window, sf::Font& font, const sf::Texture& bg) {
-    return runLevelGeneric(window, font, bg);
+bool runLevel3(sf::RenderWindow& window, sf::Font& font) {
+    return runLevel1(window, font); // tymczasowo
 }
 
 
