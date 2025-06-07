@@ -68,6 +68,7 @@ public:
     NPC(const std::string& texturePath, bool isShooting, bool isFacingRight);    // konstruktor ktory wywoluje npc ktroy sie nie porusza
     void move(float dt);
     void shoot(float dt);
+    void update(float dt);
     std::vector<Bullet>& getBullets();
 
 private:

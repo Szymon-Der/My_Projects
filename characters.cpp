@@ -123,6 +123,13 @@ NPC::NPC(const std::string& texturePath, bool isShooting, bool isFacingRight): C
     }
 }
 
+void NPC::update(float dt){
+    this->move(dt);
+    this->animate(dt);
+    if(this->isShooting){
+        this->shoot(dt);
+    }
+}
 
 //poruszanie sie prawo lewo miedzy znacznikami nadanymi w kostrutkorze
 void NPC::move(float dt){

@@ -82,6 +82,63 @@ bool runLevel1(sf::RenderWindow& window, sf::Font& font) {
         std::cerr << "Nie można załadować Images/bg.jpg" << std::endl;
     }
 
+    //wczystywanie tesktur i spirte'ow platform
+    sf::Texture tilesSet;
+    if(tilesSet.loadFromFile("Levels_textures\\Tileset.png")){
+    }
+    else{
+        std::cerr << "Blad ladowania kafelkow" << std::endl;
+    }
+
+    std::map<int, sf::Sprite> tiles;
+    sf::Sprite baseTile;
+    baseTile.setTexture(tilesSet);
+
+    int counter = 1;
+    for (int y = 0; y < 10; y++) {
+        for (int x = 0; x < 6; x++) {
+            sf::Sprite tile = baseTile; // kopiujemy bazowy sprite
+            tile.setTextureRect(sf::IntRect(x * 32, y * 32, 32, 32));
+            //tile.setScale(2.f,2.f);
+            tiles[counter++] = tile;
+        }
+    }
+
+    const int tileSize = 32;
+    const int mapWidth = 40;  // kolumny
+    const int mapHeight = 23;   //wymairy mapy, ile kafelkow sie zmiesci na mapie
+
+
+    //wektor zpaisanai poszczegolnych kafelkow, tymoczasowo tutaj. mozna przeniesc to pliku txt
+    std::vector<std::vector<int>> tileMap = {
+        {1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1}, // 1
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // 2
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // 3
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // 4
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // 5
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // 6
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // 7
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // 8
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // 9
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // 10
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // 11
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // 12
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // 13
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // 14
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // 15
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // 16
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // 17
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // 18
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}, // 19
+        {1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,3,4,1,1,1,0,0,1}, // 20 - ziemia
+        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},  // 21 - gleba
+        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1}
+    };
+
+
+
+    //generowanie okna pauzowania
     sf::RectangleShape pauseBox(sf::Vector2f(300, 150));
     pauseBox.setFillColor(sf::Color(0, 0, 0, 200));
     pauseBox.setOutlineColor(sf::Color::White);
@@ -96,11 +153,13 @@ bool runLevel1(sf::RenderWindow& window, sf::Font& font) {
     resumeText.setPosition(pauseBox.getPosition().x + 90, pauseBox.getPosition().y + 30);
     exitText.setPosition(pauseBox.getPosition().x + 110, pauseBox.getPosition().y + 80);
 
-
-    //petla lvl1
+    //============================================================
+    //=======================petla lvl1===========================
+    //============================================================
     while (window.isOpen() && !backToMenu) {
         float dt = clock.restart().asSeconds();
 
+        //obsluga wyjscia i pauzowania gry
         sf::Event event;
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) window.close();
@@ -152,6 +211,9 @@ bool runLevel1(sf::RenderWindow& window, sf::Font& font) {
         //atulaizacja stany player2
         player2.update(horizontalPlayer2, jumpPlayer2, dt);
 
+        //aktualizacja stanu NPC
+        npc.update(dt);
+
         //kontakt z podlozem dla player 1
         if (player.getPosition().y + player.getGlobalBounds().height >= groundY) {
             player.setPosition(player.getPosition().x, groundY - player.getGlobalBounds().height);
@@ -172,12 +234,7 @@ bool runLevel1(sf::RenderWindow& window, sf::Font& font) {
             player2.setGroundContact(false);
         }
 
-
-        //aktualizacja stanu NPC
-        npc.move(dt);
-        npc.animate(dt);
-        npc.shoot(dt);
-
+        //aktualizacja stanu dla pocskow strzelanych przez NPC
         auto& bullets = npc.getBullets();
         for (auto& bullet : bullets) {
             bullet.update(dt);
@@ -193,12 +250,27 @@ bool runLevel1(sf::RenderWindow& window, sf::Font& font) {
             bullets.end()
             );
 
+
         window.clear(sf::Color(50, 50, 50));
         if (hasBackground) window.draw(background);
         window.draw(ground);
+
+        for (int y = 0; y < mapHeight; y++) {
+            for (int x = 0; x < mapWidth; x++) {
+                int tileNumber = tileMap[y][x];
+                if (tileNumber != 0) {
+                    if (tiles.count(tileNumber)) {
+                        sf::Sprite& sprite = tiles[tileNumber];
+                        sprite.setPosition(x * tileSize, y * tileSize);
+                        window.draw(sprite);
+                    }
+                }
+            }
+        }
         window.draw(player);
         window.draw(player2);
         window.draw(npc);
+        //window.draw(tile1);
         for (auto& bullet : bullets) {
             window.draw(bullet);
         }
