@@ -59,6 +59,16 @@ bool runLevel1(sf::RenderWindow& window, sf::Font& font) {
     int pauseOption = 0;
 
 
+
+    sf::Music backgroundMusic;
+    if (!backgroundMusic.openFromFile("Sounds/music.mp3")) {
+        std::cerr << "Nie można załadować muzyki z Sounds/music.mp3\n";
+    } else {
+        backgroundMusic.setLoop(true);
+        backgroundMusic.play();
+    }
+
+
     //sekwencja wczytania tla dla akutalnego lvl
     sf::Texture backgroundTexture;
     sf::Sprite background;
@@ -163,13 +173,20 @@ bool runLevel1(sf::RenderWindow& window, sf::Font& font) {
         sf::Event event;
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) window.close();
-            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape) paused = !paused;
+            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape && !paused) {
+                paused = true;
+                backgroundMusic.pause(); // pauza muzyki
+            }
+
 
             if (paused && event.type == sf::Event::KeyPressed) {
                 if (event.key.code == sf::Keyboard::Up || event.key.code == sf::Keyboard::Down)
                     pauseOption = 1 - pauseOption;
                 if (event.key.code == sf::Keyboard::Enter) {
-                    if (pauseOption == 0) paused = false;
+                    if (pauseOption == 0) {
+                        paused = false;
+                        backgroundMusic.play(); // wznowienie muzyki
+                    }
                     else if (pauseOption == 1) return false;
                 }
             }

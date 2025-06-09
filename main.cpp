@@ -1,6 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include "menu.h"
 #include "levels.h"
+#include "playtime.h" // <-- dodane, żeby działało updatePlayTime
 #include <iostream>
 
 int main() {
@@ -15,10 +16,22 @@ int main() {
     Menu menu(window, font);
     bool firstRun = true;
 
+    std::string playerName;
+    sf::Clock playClock;          // zegar mierzący czas gry
+    bool clockStarted = false;    // flaga: czy zegar został uruchomiony
+
     while (window.isOpen()) {
-        // uruchamiamy menu – tylko raz pobieramy nazwę gracza
+        // pokazuje menu, przy pierwszym uruchomieniu umożliwia wpisanie nazwy gracza
         if (!menu.run(firstRun)) break;
         firstRun = false;
+
+        playerName = menu.getPlayerName();
+
+        // uruchom zegar dopiero po wpisaniu nazwy gracza (tylko raz!)
+        if (!clockStarted && !playerName.empty()) {
+            playClock.restart();
+            clockStarted = true;
+        }
 
         while (window.isOpen()) {
             int selectedLevel = menu.selectLevel();
@@ -39,9 +52,15 @@ int main() {
             default: break;
             }
 
-            // Jeśli ESC z poziomu — wróć do MENU, nie level select
+            // Jeśli ESC z poziomu poziomu – wróć do MENU, nie level select
             if (!goBackToLevelSelect) break;
         }
+    }
+
+    // po zamknięciu programu – zapisz czas gry (jeśli był liczony)
+    if (clockStarted && !playerName.empty()) {
+        int playTime = static_cast<int>(playClock.getElapsedTime().asSeconds());
+        updatePlayTime(playerName, playTime);
     }
 
     return 0;

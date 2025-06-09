@@ -2,6 +2,7 @@
 #include "menu.h"
 #include "levels.h"
 #include "characters.h"
+#include "playtime.h"
 #include <fstream>
 #include <algorithm>
 #include <sstream>
@@ -13,7 +14,7 @@ Menu::Menu(sf::RenderWindow& window, sf::Font& font)
     : m_window(window), m_font(font), m_selected(0), m_startGame(false)
 {
     loadBackground("Images/bg.jpg");
-    m_options = { "Play", "Instructions", "Leaderboard", "Exit" };
+    m_options = { "Play", "Profile", "Leaderboard", "Exit" };
     initializeMenu();
     preloadLevelTextures();
 }
@@ -92,8 +93,8 @@ void Menu::processEvents() {
                     return;
                 }
 
-                else if (choice == "Instructions") {
-                    showInstructions();
+                else if (choice == "Profile") {
+                    showProfile();
                 }
                 else if (choice == "Leaderboard") {
                     displayPlayers();
@@ -153,41 +154,73 @@ void Menu::render() {
     m_window.display();
 }
 
-void Menu::showInstructions() {
-    sf::Text instructions(
-        "Use arrow keys to navigate.\n"
-        "Press Enter to confirm.\n"
-        "Press ESC to return to menu.",
-        m_font, 28
-        );
-    instructions.setFillColor(sf::Color::White);
-
-    auto winSize = m_window.getSize();
-    sf::FloatRect bounds = instructions.getLocalBounds();
-    instructions.setPosition(
-        (static_cast<float>(winSize.x) - bounds.width) / 2.f - bounds.left,
-        (static_cast<float>(winSize.y) - bounds.height) / 2.f - bounds.top
-        );
-
+void Menu::showProfile() {
     bool back = false;
+
+    // Nagłówek: nazwa gracza (na górze)
+    sf::Text playerNameText(m_playerName, m_font, 40);
+    playerNameText.setFillColor(sf::Color::Yellow);
+    sf::FloatRect nameBounds = playerNameText.getLocalBounds();
+    playerNameText.setOrigin(nameBounds.width / 2.f, nameBounds.height / 2.f);
+    playerNameText.setPosition(
+        static_cast<float>(m_window.getSize().x) / 2.f,
+        60.f
+        );
+
+    // Podpis: czas gry
+    int seconds = readPlayTime(m_playerName);
+
+    // Pierwsza część – biały napis
+    sf::Text labelText("Time spent on playing:", m_font, 28);
+    labelText.setFillColor(sf::Color::White);
+    sf::FloatRect labelBounds = labelText.getLocalBounds();
+    labelText.setOrigin(labelBounds.width / 2.f, labelBounds.height / 2.f);
+    labelText.setPosition(
+        static_cast<float>(m_window.getSize().x) / 2.f - 40.f, // lekko w lewo
+        120.f
+        );
+
+    // Druga część – zielony czas
+    sf::Text timeOnlyText(formatTime(seconds), m_font, 28);
+    timeOnlyText.setFillColor(sf::Color::Green);
+    sf::FloatRect timeBounds = timeOnlyText.getLocalBounds();
+    timeOnlyText.setOrigin(timeBounds.width / 2.f, timeBounds.height / 2.f);
+    timeOnlyText.setPosition(
+        labelText.getPosition().x + labelBounds.width / 2.f + timeBounds.width / 2.f + 5.f,
+        120.f
+        );
+
+
+    // Stopka: ESC aby wyjść
+    sf::Text footer("Press ESC to return to menu", m_font, 20);
+    footer.setFillColor(sf::Color::White);
+    sf::FloatRect fBounds = footer.getLocalBounds();
+    footer.setOrigin(fBounds.width / 2.f, fBounds.height / 2.f);
+    footer.setPosition(
+        static_cast<float>(m_window.getSize().x) / 2.f,
+        static_cast<float>(m_window.getSize().y) - fBounds.height - 20.f
+        );
+
     while (m_window.isOpen() && !back) {
         sf::Event event;
         while (m_window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed) {
+            if (event.type == sf::Event::Closed)
                 m_window.close();
-                return;
-            }
-            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape) {
+            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)
                 back = true;
-            }
         }
 
         m_window.clear();
         m_window.draw(m_backgroundSprite);
-        m_window.draw(instructions);
+        m_window.draw(playerNameText);
+        m_window.draw(labelText);
+        m_window.draw(timeOnlyText);
+        m_window.draw(footer);
         m_window.display();
     }
 }
+
+
 
 std::vector<std::string> Menu::readPlayerNamesFromCSV(const std::string& filename) {
     std::vector<std::string> result;
@@ -212,13 +245,37 @@ std::vector<std::string> Menu::readPlayerNamesFromCSV(const std::string& filenam
 }
 
 void Menu::displayPlayers() {
-    std::vector<std::string> players = readPlayerNamesFromCSV("csv/players.csv");
-    std::sort(players.begin(), players.end());
+    std::ifstream file("csv/players.csv");
+    std::vector<std::pair<std::string, int>> players;
 
-    // Pokazujemy tylko 10 najlepszych
+    std::string line;
+    while (std::getline(file, line)) {
+        if (line.empty()) continue;
+
+        std::stringstream ss(line);
+        std::string name, timeStr;
+        if (std::getline(ss, name, ',') && std::getline(ss, timeStr)) {
+            try {
+                int time = std::stoi(timeStr);
+                players.emplace_back(name, time);
+            } catch (...) {
+                players.emplace_back(name, 0); // jeśli nie ma czasu, zakładamy 0
+            }
+        } else {
+            players.emplace_back(line, 0); // stary format bez czasu
+        }
+    }
+
+    // Sortowanie malejąco po czasie
+    std::sort(players.begin(), players.end(),
+              [](const auto& a, const auto& b) {
+                  return a.second > b.second;
+              });
+
     if (players.size() > 10) {
         players.resize(10);
     }
+
 
     bool back = false;
     while (m_window.isOpen() && !back) {
@@ -257,7 +314,7 @@ void Menu::displayPlayers() {
 
         std::vector<std::string> podiumNames;
         for (size_t i = 0; i < std::min<size_t>(3, players.size()); ++i) {
-            podiumNames.push_back(players[i]);
+            podiumNames.push_back(players[i].first);
         }
 
         float x1 = centerX - (stepW / 2.f);
@@ -345,7 +402,7 @@ void Menu::displayPlayers() {
         float startY = baseY + maxH + 40.f;
         float listX = centerX - (stepW / 2.f);
         for (size_t i = 3; i < players.size(); ++i) {
-            std::string line = std::to_string(static_cast<int>(i) + 1) + ". " + players[i];
+            std::string line = std::to_string(static_cast<int>(i) + 1) + ". " + players[i].first;
             sf::Text text(line, m_font, 24);
             text.setFillColor(sf::Color::White);
             float ty = startY + static_cast<float>(i - 3) * 35.f;
