@@ -54,9 +54,17 @@ bool runLevel1(sf::RenderWindow& window, sf::Font& font) {
     ground.setPosition(0.f, groundY);
 
     sf::Clock clock;
+    Timer levelTimer(180);  // 3 minuty = 180 sekund
+
     bool backToMenu = false;
     bool paused = false;
     int pauseOption = 0;
+
+    sf::Text timerText;
+    timerText.setFont(font);  // używa tej samej czcionki co reszta
+    timerText.setCharacterSize(24);
+    timerText.setFillColor(sf::Color::White);
+    timerText.setPosition(20, 20);  // dowolna pozycja w rogu
 
 
 
@@ -149,59 +157,94 @@ bool runLevel1(sf::RenderWindow& window, sf::Font& font) {
 
 
     //generowanie okna pauzowania
-    sf::RectangleShape pauseBox(sf::Vector2f(300, 150));
+    sf::RectangleShape pauseBox(sf::Vector2f(300, 200));
     pauseBox.setFillColor(sf::Color(0, 0, 0, 200));
     pauseBox.setOutlineColor(sf::Color::White);
     pauseBox.setOutlineThickness(3);
-    pauseBox.setPosition(window.getSize().x / 2.f - 150, window.getSize().y / 2.f - 75);
+    pauseBox.setPosition(window.getSize().x / 2.f - 150, window.getSize().y / 2.f - 100);
 
-    sf::Font gatrich;
-    gatrich.loadFromFile("Fonts/Gatrich.otf");
+    sf::Text resumeText("Resume", font, 28);
+    sf::Text volumeText("Volume", font, 28);
+    sf::Text exitText("Exit", font, 28);
+    resumeText.setPosition(pauseBox.getPosition().x + 90, pauseBox.getPosition().y + 20);
+    volumeText.setPosition(pauseBox.getPosition().x + 90, pauseBox.getPosition().y + 70);
+    exitText.setPosition(pauseBox.getPosition().x + 110, pauseBox.getPosition().y + 130);
 
-    sf::Text resumeText("Resume", gatrich, 28);
-    sf::Text exitText("Exit", gatrich, 28);
-    resumeText.setPosition(pauseBox.getPosition().x + 90, pauseBox.getPosition().y + 30);
-    exitText.setPosition(pauseBox.getPosition().x + 110, pauseBox.getPosition().y + 80);
+    sf::RectangleShape volumeBar(sf::Vector2f(150, 10));
+    volumeBar.setFillColor(sf::Color::White);
+    volumeBar.setPosition(pauseBox.getPosition().x + pauseBox.getSize().x / 2.f - volumeBar.getSize().x / 2.f,
+                          volumeText.getPosition().y + 35);
+
+    sf::CircleShape volumeKnob(7);
+    volumeKnob.setFillColor(sf::Color::Red);
+
+    const int pauseOptionsCount = 3;
+    float volume = 50.f;  // Domyślna głośność
+    backgroundMusic.setVolume(volume);
 
     //============================================================
     //=======================petla lvl1===========================
     //============================================================
     while (window.isOpen() && !backToMenu) {
         float dt = clock.restart().asSeconds();
-
-        //obsluga wyjscia i pauzowania gry
         sf::Event event;
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) window.close();
             if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape && !paused) {
                 paused = true;
-                backgroundMusic.pause(); // pauza muzyki
+                backgroundMusic.pause();
+                levelTimer.pause();
             }
 
-
             if (paused && event.type == sf::Event::KeyPressed) {
-                if (event.key.code == sf::Keyboard::Up || event.key.code == sf::Keyboard::Down)
-                    pauseOption = 1 - pauseOption;
+                if (event.key.code == sf::Keyboard::Up) pauseOption = (pauseOption + pauseOptionsCount - 1) % pauseOptionsCount;
+                if (event.key.code == sf::Keyboard::Down) pauseOption = (pauseOption + 1) % pauseOptionsCount;
+
+                if (pauseOption == 1) { // Volume
+                    if (event.key.code == sf::Keyboard::Left && volume > 0.f) {
+                        volume = std::max(0.f, volume - 5.f);
+                        backgroundMusic.setVolume(volume);
+                    }
+                    if (event.key.code == sf::Keyboard::Right && volume < 100.f) {
+                        volume = std::min(100.f, volume + 5.f);
+                        backgroundMusic.setVolume(volume);
+                    }
+                }
+
                 if (event.key.code == sf::Keyboard::Enter) {
                     if (pauseOption == 0) {
                         paused = false;
-                        backgroundMusic.play(); // wznowienie muzyki
+                        backgroundMusic.play();
+                        levelTimer.resume();
                     }
-                    else if (pauseOption == 1) return false;
+                    else if (pauseOption == 2) {
+                        backgroundMusic.stop();
+                        return false;
+                    }
                 }
             }
         }
 
         if (paused) {
             window.clear();
-            if (backgroundTexture.getSize().x > 0) {
-                window.draw(background);
-            }
-
+            if (hasBackground) window.draw(background);
             window.draw(pauseBox);
+
             resumeText.setFillColor(pauseOption == 0 ? sf::Color::Yellow : sf::Color::White);
-            exitText.setFillColor(pauseOption == 1 ? sf::Color::Yellow : sf::Color::White);
+            volumeText.setFillColor(pauseOption == 1 ? sf::Color::Yellow : sf::Color::White);
+            exitText.setFillColor(pauseOption == 2 ? sf::Color::Yellow : sf::Color::White);
+
             window.draw(resumeText);
+            window.draw(volumeText);
+
+            window.draw(volumeBar);
+            volumeKnob.setPosition(
+                volumeBar.getPosition().x + (volume / 100.f) * volumeBar.getSize().x - volumeKnob.getRadius(),
+                volumeBar.getPosition().y + volumeBar.getSize().y / 2.f - volumeKnob.getRadius()
+                );
+
+            window.draw(volumeKnob);
+
             window.draw(exitText);
             window.display();
             continue;
@@ -291,6 +334,10 @@ bool runLevel1(sf::RenderWindow& window, sf::Font& font) {
         for (auto& bullet : bullets) {
             window.draw(bullet);
         }
+        timerText.setString("Time left: " + levelTimer.getFormattedTime());
+        window.draw(timerText);
+
+
         window.display();
     }
 
