@@ -211,3 +211,46 @@ void Bullet::activate(){
 bool Bullet::getActive() const {
     return active;
 }
+
+
+//=======================================
+//---------------KOLIZJE-----------------
+//=======================================
+//kolizja npc i character do sciany
+void resolveCollisions(Character& character, const std::vector<sf::FloatRect>& tiles) {
+    sf::FloatRect bounds = character.getGlobalBounds();
+    bool onGround = false;
+
+    for (const auto& tile : tiles) {
+        if (bounds.intersects(tile)) {
+            float characterBottom = bounds.top + bounds.height;
+            float tileTop = tile.top;
+
+            bool isFallingOnTile = (characterBottom > tileTop) &&
+                                   (bounds.top < tileTop) &&
+                                   (bounds.left + bounds.width > tile.left + 5) &&
+                                   (bounds.left < tile.left + tile.width - 5);
+
+            if (isFallingOnTile) {
+                // Przesuwamy całą postać tak, aby jej dolna krawędź równała się górnej kafelka
+                character.setPosition(character.getPosition().x, tileTop - bounds.height + character.getOrigin().y);
+                onGround = true;
+            }
+        }
+    }
+
+    character.setGroundContact(onGround);
+}
+
+
+//kolzja bullet do sicany
+void resolveCollisions(Bullet& bullet, const std::vector<sf::FloatRect>& tiles) {
+    sf::FloatRect bounds = bullet.getGlobalBounds();
+
+    for (const auto& tile : tiles) {
+        if (bounds.intersects(tile)) {
+            bullet.deactive(); // dezaktywuj pocisk przy kolizji
+            break;
+        }
+    }
+}

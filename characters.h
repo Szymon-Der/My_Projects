@@ -80,4 +80,9 @@ private:
     void loadAnimation();
 };
 
+
+//funckja sprawdzajaca czy character/npc coliduje i przecizaona dla bullet
+void resolveCollisions(Character& character, const std::vector<sf::FloatRect>& tiles);
+void resolveCollisions(Bullet& bullet, const std::vector<sf::FloatRect>& tiles);
+
 #endif // CHARACTERS_H
