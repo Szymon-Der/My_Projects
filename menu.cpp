@@ -13,7 +13,7 @@
 Menu::Menu(sf::RenderWindow& window, sf::Font& font)
     : m_window(window), m_font(font), m_selected(0), m_startGame(false)
 {
-    loadBackground("Images/bg.jpg");
+    loadBackground("Images/bg1.png");
     m_options = { "Play", "Profile", "Leaderboard", "Exit" };
     initializeMenu();
     preloadLevelTextures();
