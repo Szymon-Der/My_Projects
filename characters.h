@@ -25,6 +25,12 @@ public:
     void move(int horizontalDirection, bool jump, float dt); //metoda ktora bedzie aktualizowala pozycje z uwzgledniem grawitacji gdzie pierwsze przymuje wartosci {-1,0,1}
     void update(int horizontalDirection, bool jump, float dt); // jednoczesne wywolanie move i animate
     void setGroundContact(bool grounding); //ustawienie statusu isOnground
+
+    void setVelocity(float vx, float vy);
+    sf::Vector2f getVelocity();
+    //friend bool resolveCollisions(Character& character, const std::vector<sf::FloatRect>& tiles);
+
+
 protected:
     //parametry podstawowe
     sf::Texture texture;

@@ -7,7 +7,7 @@
 //konstrukotr nadajacy wartosci fizyczne oraz przypisujacy plik z textura jako zmienna
 Character::Character(const std::string& texturePath) :
     isOnGround(false), facingRight(true), moveSpeed(150.f),
-    jumpStrength(350.f), gravity(500.f), currentState(CharacterState::Static),
+    jumpStrength(170.f), gravity(200.f), currentState(CharacterState::Static),
     frameIndex(0), animationTimer(0.f), frameDuration(0.1f) {
     if(!texture.loadFromFile(texturePath)){
         std::cerr << "blad ladowania textury z pliku: " << texturePath << std::endl;
@@ -74,25 +74,40 @@ void Character::animate(float dt){
         setTextureRect(frames[currentState][frameIndex]);
         animationTimer=0.f;
     }
-
-    if (!isOnGround) {
-        setAnimationState(CharacterState::Jump);
-    } else if (velocity.x != 0) {
-        setAnimationState(CharacterState::Run);
-    } else {
-        setAnimationState(CharacterState::Static);
-    }
+    // Logika ustawiania stanu animacji została przeniesiona do metody update()
 }
 
 //wywolanie jednoczenie move i animate
 void Character::update(int horizontalDirection, bool jump, float dt){
+    // Najpierw zdecyduj o stanie animacji
+    if (velocity.y != 0) {
+        setAnimationState(CharacterState::Jump);
+    } else if (velocity.x != 0 && velocity.y == 0) { // Sprawdź kierunek ruchu poziomego
+        setAnimationState(CharacterState::Run);
+    } else {
+        setAnimationState(CharacterState::Static);
+    }
+
+
+    // Następnie zaktualizuj pozycję i odtwórz animację dla bieżącego stanu
     move(horizontalDirection, jump, dt);
     animate(dt);
 }
 
+
 void Character::setGroundContact(bool grounding){
     isOnGround = grounding;
 }
+
+void Character::setVelocity(float vx, float vy) {
+    this->velocity.x = vx;
+    this->velocity.y = vy;
+}
+
+sf::Vector2f Character::getVelocity() {
+    return this->velocity;
+}
+
 
 //=======================================
 //---------------NPC---------------------
@@ -103,7 +118,7 @@ NPC::NPC(const std::string& texturePath, bool isShooting, std::pair<float, float
     Character(texturePath), isShooting(isShooting), maxPositions(maxPositions), shootCooldown(4.f), lastShoot(0.f){
     loadAnimation();
     setAnimationState(CharacterState::Run);
-    this->moveSpeed = 100.f;
+    this->moveSpeed = 50.f;
     setScale(1.5f,1.5f);
     setOrigin(getLocalBounds().width / 2.f, 0.f);
 }
@@ -111,7 +126,7 @@ NPC::NPC(const std::string& texturePath, bool isShooting, std::pair<float, float
 //konstruktor nieporuszajacego sie npc
 NPC::NPC(const std::string& texturePath, bool isShooting, bool isFacingRight): Character(texturePath), isShooting(isShooting), shootCooldown(3.f), lastShoot(0.f){
     loadAnimation();
-    setAnimationState(CharacterState::Run);
+    setAnimationState(CharacterState::Static);
     this->moveSpeed = 0.f;
     this->facingRight = isFacingRight;
     setOrigin(getLocalBounds().width / 2.f, 0.f);
@@ -219,26 +234,58 @@ bool Bullet::getActive() const {
 //kolizja npc i character do sciany
 void resolveCollisions(Character& character, const std::vector<sf::FloatRect>& tiles) {
     sf::FloatRect bounds = character.getGlobalBounds();
+    sf::Vector2f characterPos = character.getPosition();
+    sf::Vector2f characterVel = character.getVelocity();
+    // sf::Vector2f origin = character.getOrigin(); // Origin jest brany pod uwagę przez getGlobalBounds() i setPosition()
+
     bool onGround = false;
+
+    // Użyj kopii prędkości, żeby ewentualne zmiany w pętli nie wpływały na kolejne iteracje
+    sf::Vector2f newVelocity = characterVel;
+    sf::Vector2f newPosition = characterPos;
 
     for (const auto& tile : tiles) {
         if (bounds.intersects(tile)) {
-            float characterBottom = bounds.top + bounds.height;
-            float tileTop = tile.top;
+            // Obliczamy głębokość przenikania dla obu osi
+            float overlapX = std::min(bounds.left + bounds.width, tile.left + tile.width) - std::max(bounds.left, tile.left);
+            float overlapY = std::min(bounds.top + bounds.height, tile.top + tile.height) - std::max(bounds.top, tile.top);
 
-            bool isFallingOnTile = (characterBottom > tileTop) &&
-                                   (bounds.top < tileTop) &&
-                                   (bounds.left + bounds.width > tile.left + 5) &&
-                                   (bounds.left < tile.left + tile.width - 5);
+            // Sprawdzamy, który kierunek kolizji jest dominujący (które przenikanie jest mniejsze)
+            // Dodano małą tolerancję (epsilon) aby uniknąć problemów z punktami pływającymi
+            const float epsilon = 0.001f;
 
-            if (isFallingOnTile) {
-                // Przesuwamy całą postać tak, aby jej dolna krawędź równała się górnej kafelka
-                character.setPosition(character.getPosition().x, tileTop - bounds.height + character.getOrigin().y);
-                onGround = true;
+            if (overlapX < overlapY + epsilon) { // Kolizja z boku (lewa/prawa) jest dominująca
+                if (newVelocity.x > 0 && bounds.left < tile.left) {
+                    // Kolizja od lewej strony kafelka (postać idzie w prawo)
+                    // Wypychamy postać na lewo o wartość przenikania
+                    newPosition.x = characterPos.x - overlapX;
+                    newVelocity.x = 0; // Zatrzymujemy ruch w poziomie
+                } else if (newVelocity.x < 0 && bounds.left + bounds.width > tile.left + tile.width) {
+                    // Kolizja od prawej strony kafelka (postać idzie w lewo)
+                    // Wypychamy postać na prawo o wartość przenikania
+                    newPosition.x = characterPos.x + overlapX;
+                    newVelocity.x = 0; // Zatrzymujemy ruch w poziomie
+                }
+            } else { // Kolizja z góry/dołu jest dominująca
+                if (newVelocity.y >= 0 && bounds.top < tile.top) { // Zmieniono z > na >= aby uwzględnić prędkość 0
+                    // Kolizja od góry kafelka (postać spada lub stoi)
+                    // Ustawiamy postać na kafelku
+                    newPosition.y = characterPos.y - overlapY;
+                    newVelocity.y = 0; // Zatrzymujemy ruch w pionie (na dół)
+                    onGround = true; // Postać jest na ziemi
+                } else if (newVelocity.y < 0 && bounds.top + bounds.height > tile.top + tile.height) {
+                    // Kolizja od dołu kafelka (postać skacze w górę i uderza w spód kafelka)
+                    // Wypychamy postać pod kafelek
+                    newPosition.y = characterPos.y + overlapY;
+                    newVelocity.y = 0; // Zatrzymujemy ruch w pionie (w górę)
+                }
             }
         }
     }
 
+    // Dopiero po przetworzeniu wszystkich kolizji aktualizujemy pozycję i prędkość postaci
+    character.setPosition(newPosition);
+    character.setVelocity(newVelocity.x, newVelocity.y);
     character.setGroundContact(onGround);
 }
 
