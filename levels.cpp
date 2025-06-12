@@ -41,15 +41,21 @@ bool runLevel1(sf::RenderWindow& window, sf::Font& font) {
     // Generowanie postaci
     Character player("Characters/Character 9.png");
     Character player2("Characters/Character 1.png");
-    NPC npc("Characters/Mushroom.png", false, std::make_pair(150.f, 800.f));
+    NPC npc("Characters/Mushroom.png", false, std::make_pair(100.f, 300.f));
+    NPC npc2("Characters/Mushroom.png", false, std::make_pair(400.f, 600.f));
+    NPC npc3("Characters/Mushroom.png", false, std::make_pair(200.f, 350.f));
+    NPC npc4("Characters/Mushroom.png", false, std::make_pair(800.f, 1200.f));
 
     // Ustawienie początkowych pozycji postaci
-    player.setPosition(100.f, 550.f);
-    player2.setPosition(100.f, 550.f);
-    npc.setPosition(300.f, 450.f);
+    player.setPosition(100.f, 549.f);
+    player2.setPosition(150.f, 549.f);
+    npc.setPosition(150.f, 449.f);
+    npc2.setPosition(550.f, 300.f);
+    npc3.setPosition(250.f, 200.f);
+    npc4.setPosition(1000.f, 300.f);
 
     sf::Clock clock;
-    Timer levelTimer(180);  // 3 minuty = 180 sekund
+    Timer levelTimer(50);  // 3 minuty = 180 sekund
 
     bool backToMenu = false;
     bool paused = false;
@@ -123,14 +129,14 @@ bool runLevel1(sf::RenderWindow& window, sf::Font& font) {
 
     // Wektor zapisanania poszczególnych kafelków, tymczasowo tutaj. Można przenieść do pliku txt
     std::vector<std::vector<int>> tileMap = {
-    //   0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39
+        //   0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39
         {13, 7, 8, 9, 7, 8, 9, 7, 8, 9, 7, 8, 9, 7, 8, 9, 7, 8, 9, 7, 8, 9, 7, 8, 9, 7, 8, 9, 7, 8, 9, 7, 8, 9, 7, 8, 9, 7, 8,11}, // 0
-        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,54, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11}, // 1
-        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,32,33,35,33,34, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11}, // 2
-        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11}, // 3
-        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,37,33,33,33,33,33,33,33,33,33,33,34, 0, 0, 0, 0,32,33,33,17}, // 4
+        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 54, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11}, // 1
+        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11}, // 2
+        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32,33,45, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11}, // 3
+        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 33, 33, 34, 0,0,0,0,37,33,33,33,33,33,33,33,33,33,33,34, 0, 0, 0, 0,32,33,33,17}, // 4
         {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11}, // 5
-        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11}, // 6
+        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 33, 34, 0, 0,11}, // 6
         {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11}, // 7
         {27,33,33,33,33,33,33,33,33,33,33,33,34, 0, 0, 0, 0,32,33,33,52,33,33,34, 0, 0, 0, 0,32,33,33,33,33,33,33,33,33,33,33,17}, // 8
         {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11}, // 9
@@ -160,8 +166,8 @@ bool runLevel1(sf::RenderWindow& window, sf::Font& font) {
     }
 
     //obsluga ukonczenia poziomu
-    sf::Vector2i targetTileCoordsPlayer1(21, 1); // Column, Row
-    sf::Vector2i targetTileCoordsPlayer2(19, 1); // Column, Row
+    sf::Vector2i targetTileCoordsPlayer1(21, 3); // Column, Row
+    sf::Vector2i targetTileCoordsPlayer2(19, 2); // Column, Row
 
     // Create sf::RectangleShape for visual representation
     sf::RectangleShape targetRectPlayer1Visual(sf::Vector2f(tileSize, tileSize));
@@ -226,6 +232,15 @@ bool runLevel1(sf::RenderWindow& window, sf::Font& font) {
     sf::FloatRect backToMenuBounds = backToMenuText.getLocalBounds();
     backToMenuText.setOrigin(backToMenuBounds.width / 2.f, backToMenuBounds.height / 2.f);
     backToMenuText.setPosition(window.getSize().x / 2.f, window.getSize().y / 2.f + 80);
+
+    // Wczytanie dźwięków
+    sf::SoundBuffer beepBuf, gameoverBuf;
+    if (!beepBuf.loadFromFile("Sounds/beep.wav")) std::cerr << "Nie można załadować beep.wav\n";
+    if (!gameoverBuf.loadFromFile("Sounds/gameover.wav")) std::cerr << "Nie można załadować gameover.wav\n";
+    sf::Sound beepSound(beepBuf), gameoverSound(gameoverBuf);
+
+    int lastBeepSecond = -1;
+    bool gameoverPlayed = false;
 
 
     //============================================================
@@ -331,6 +346,17 @@ bool runLevel1(sf::RenderWindow& window, sf::Font& font) {
             continue;
         }
 
+        int rem = levelTimer.getRemainingSeconds();
+        // co sekundę przez ostatnie 10 sekund
+        if (rem <= 10 && rem > 0 && rem != lastBeepSecond) {
+            beepSound.play();
+            lastBeepSecond = rem;
+        }
+        // na zero raz – dźwięk końca gry
+        if (rem == 0 && !gameoverPlayed) {
+            gameoverSound.play();
+            gameoverPlayed = true;
+        }
 
         // Sterowanie dla gracza 1
         int horizontalPlayer1 = 0;
@@ -352,11 +378,17 @@ bool runLevel1(sf::RenderWindow& window, sf::Font& font) {
 
         // Aktualizacja stanu NPC
         npc.update(dt);
+        npc2.update(dt);
+        npc3.update(dt);
+        npc4.update(dt);
 
         // Interakcje ze ścianami dla graczy, pocisków i NPC
         resolveCollisions(player, solidTiles);
         resolveCollisions(player2, solidTiles);
         resolveCollisions(npc, solidTiles);
+        resolveCollisions(npc2, solidTiles);
+        resolveCollisions(npc3, solidTiles);
+        resolveCollisions(npc4, solidTiles);
 
         // Kolizje pocisków z NPC
         for (auto& bullet : npc.getBullets()) {
@@ -379,10 +411,52 @@ bool runLevel1(sf::RenderWindow& window, sf::Font& font) {
         //sprawdzanie kolizcji gracze npc
         sf::FloatRect player1Bounds = player.getGlobalBounds();
         sf::FloatRect npcBounds = npc.getGlobalBounds();
+        sf::FloatRect npc2Bounds = npc2.getGlobalBounds();
+        sf::FloatRect npc3Bounds = npc3.getGlobalBounds();
+        sf::FloatRect npc4Bounds = npc4.getGlobalBounds();
 
         if (player1Bounds.intersects(npcBounds)) {
             float player1Bottom = player1Bounds.top + player1Bounds.height;
             float overlapY = player1Bottom - npcBounds.top;
+
+            if (player.getVelocity().y > 0 && overlapY < 20.f) {
+                player.setVelocity(player.getVelocity().x, -250.f);
+                player.setGroundContact(false);
+            } else {
+                gameOver = true;
+                levelTimer.pause();
+            }
+        }
+
+        if (player1Bounds.intersects(npc2Bounds)) {
+            float player1Bottom = player1Bounds.top + player1Bounds.height;
+            float overlapY = player1Bottom - npc2Bounds.top;
+
+            if (player.getVelocity().y > 0 && overlapY < 20.f) {
+                player.setVelocity(player.getVelocity().x, -250.f);
+                player.setGroundContact(false);
+            } else {
+                gameOver = true;
+                levelTimer.pause();
+            }
+        }
+
+        if (player1Bounds.intersects(npc3Bounds)) {
+            float player1Bottom = player1Bounds.top + player1Bounds.height;
+            float overlapY = player1Bottom - npc3Bounds.top;
+
+            if (player.getVelocity().y > 0 && overlapY < 20.f) {
+                player.setVelocity(player.getVelocity().x, -250.f);
+                player.setGroundContact(false);
+            } else {
+                gameOver = true;
+                levelTimer.pause();
+            }
+        }
+
+        if (player1Bounds.intersects(npc4Bounds)) {
+            float player1Bottom = player1Bounds.top + player1Bounds.height;
+            float overlapY = player1Bottom - npc4Bounds.top;
 
             if (player.getVelocity().y > 0 && overlapY < 20.f) {
                 player.setVelocity(player.getVelocity().x, -250.f);
@@ -398,6 +472,45 @@ bool runLevel1(sf::RenderWindow& window, sf::Font& font) {
         if (player2Bounds.intersects(npcBounds)) {
             float player2Bottom = player2Bounds.top + player2Bounds.height;
             float overlapY = player2Bottom - npcBounds.top;
+
+            if (player2.getVelocity().y > 0 && overlapY < 20.f) {
+                player2.setVelocity(player2.getVelocity().x, -250.f);
+                player2.setGroundContact(false);
+            } else {
+                gameOver = true;
+                levelTimer.pause();
+            }
+        }
+
+        if (player2Bounds.intersects(npc2Bounds)) {
+            float player2Bottom = player2Bounds.top + player2Bounds.height;
+            float overlapY = player2Bottom - npc2Bounds.top;
+
+            if (player2.getVelocity().y > 0 && overlapY < 20.f) {
+                player2.setVelocity(player2.getVelocity().x, -250.f);
+                player2.setGroundContact(false);
+            } else {
+                gameOver = true;
+                levelTimer.pause();
+            }
+        }
+
+        if (player2Bounds.intersects(npc3Bounds)) {
+            float player2Bottom = player2Bounds.top + player2Bounds.height;
+            float overlapY = player2Bottom - npc3Bounds.top;
+
+            if (player2.getVelocity().y > 0 && overlapY < 20.f) {
+                player2.setVelocity(player2.getVelocity().x, -250.f);
+                player2.setGroundContact(false);
+            } else {
+                gameOver = true;
+                levelTimer.pause();
+            }
+        }
+
+        if (player2Bounds.intersects(npc4Bounds)) {
+            float player2Bottom = player2Bounds.top + player2Bounds.height;
+            float overlapY = player2Bottom - npc4Bounds.top;
 
             if (player2.getVelocity().y > 0 && overlapY < 20.f) {
                 player2.setVelocity(player2.getVelocity().x, -250.f);
@@ -453,6 +566,9 @@ bool runLevel1(sf::RenderWindow& window, sf::Font& font) {
         window.draw(player);
         window.draw(player2);
         window.draw(npc);
+        window.draw(npc2);
+        window.draw(npc3);
+        window.draw(npc4);
         for (auto& bullet : bullets) {
             window.draw(bullet);
         }
@@ -1335,5 +1451,3 @@ bool runLevel3(sf::RenderWindow& window, sf::Font& font) {
 
     return true;
 }
-
-

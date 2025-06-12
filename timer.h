@@ -10,6 +10,12 @@ public:
     void pause();
     void resume();
     std::string getFormattedTime() const;
+    int getRemainingSeconds() const {
+        sf::Time currentTime = isPaused ? pausedTime : clock.getElapsedTime();
+        int elapsed = static_cast<int>((currentTime - startTime - totalPausedDuration).asSeconds());
+        int remaining = durationSeconds - elapsed;
+        return remaining > 0 ? remaining : 0;
+    }
 
 private:
     sf::Clock clock;
