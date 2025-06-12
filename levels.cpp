@@ -41,7 +41,7 @@ bool runLevel1(sf::RenderWindow& window, sf::Font& font) {
     // Generowanie postaci
     Character player("Characters/Character 9.png");
     Character player2("Characters/Character 1.png");
-    NPC npc("Characters/Mushroom.png", true, std::make_pair(100.f, 300.f));
+    NPC npc("Characters/Mushroom.png", false, std::make_pair(100.f, 300.f));
     NPC npc2("Characters/Mushroom.png", false, std::make_pair(400.f, 600.f));
     NPC npc3("Characters/Mushroom.png", false, std::make_pair(200.f, 350.f));
     NPC npc4("Characters/Mushroom.png", false, std::make_pair(800.f, 1200.f));
@@ -1036,9 +1036,9 @@ bool runLevel3(sf::RenderWindow& window, sf::Font& font) {
     NPC npc("Characters/Mushroom.png", false, std::make_pair(150.f, 800.f));
 
     // Ustawienie początkowych pozycji postaci
-    player.setPosition(100.f, 550.f);
-    player2.setPosition(100.f, 550.f);
-    npc.setPosition(300.f, 450.f);
+    player.setPosition(100.f, 600.f);
+    player2.setPosition(150.f, 600.f);
+    npc.setPosition(900.f, 400.f);
 
     sf::Clock clock;
     Timer levelTimer(180);  // 3 minuty = 180 sekund
@@ -1048,7 +1048,6 @@ bool runLevel3(sf::RenderWindow& window, sf::Font& font) {
     bool gameOver = false; // Nowa flaga dla stanu GAME OVER
     int pauseOption = 0;
     int gameOverOption = 0; // Nowa opcja dla menu GAME OVER
-
 
     sf::Text timerText;
     timerText.setFont(font);  // Używa tej samej czcionki co reszta
@@ -1109,36 +1108,35 @@ bool runLevel3(sf::RenderWindow& window, sf::Font& font) {
     }
 
     const int tileSize = 32;
-    const int mapWidth = 40;  // Kolumny
-    const int mapHeight = 23;   // Wymiary mapy, ile kafelków się zmieści na mapie
-
+    const int mapWidth = 40;
+    const int mapHeight = 23;
 
     // Wektor zapisanania poszczególnych kafelków, tymczasowo tutaj. Można przenieść do pliku txt
     std::vector<std::vector<int>> tileMap = {
-        //   0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39
-        {13, 7, 8, 9, 7, 8, 9, 7, 8, 9, 7, 8, 9, 7, 8, 9, 7, 8, 9, 7, 8, 9, 7, 8, 9, 7, 8, 9, 7, 8, 9, 7, 8, 9, 7, 8, 9, 7, 8,11}, // 0
-        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11}, // 1
-        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11}, // 2
-        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11}, // 3
-        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11}, // 4
-        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11}, // 5
-        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11}, // 6
-        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11}, // 7
-        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11}, // 8
-        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11}, // 9
-        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11}, // 10
-        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11}, // 11
-        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11}, // 12
-        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11}, // 13
-        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11}, // 14
-        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11}, // 15
-        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11}, // 16
-        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11}, // 17
-        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11}, // 18
-        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11}, // 19
-        {24, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,26}, // 20 - ziemia
-        {12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12}, // 21
-        {12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12}  // 22
+        //  0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39
+        {13, 7, 8, 9, 7, 8, 9, 7, 8, 9, 7, 8, 9, 7, 8, 9, 7, 8, 9, 7, 8, 9, 7, 8, 9, 7, 8, 9, 7, 8, 9, 7, 8, 9, 7, 8, 9, 7, 8,11},
+        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11},
+        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11},
+        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11},
+        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11},
+        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,32,33,33,34, 0,11}, // Cel
+        {27,33,33,33,33,33,34, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,32,33,33,33,33,33,33,33,33,33,33,33,33,33,17},
+        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11},
+        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11},
+        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11},
+        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11},
+        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11},
+        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11},
+        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11},
+        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11},
+        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11},
+        {27,33,33,33,33,33,33,33,33,33,33,33,33,34, 0, 0, 0,32,33,33,33,33,33,33,33,33,33,33,33,33,33,33,33,33,33,33,33,33,33,11},
+        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11},
+        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11},
+        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11},
+        {24, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,26},
+        {12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12},
+        {12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12}
     };
 
     // Na podstawie wektora tileMap utworzono wektor solidTiles, który będzie do sprawdzania kontaktu z kafelkami (0-brak kolizji, !0 kolizja)
@@ -1152,8 +1150,8 @@ bool runLevel3(sf::RenderWindow& window, sf::Font& font) {
     }
 
     //obsluga ukonczenia poziomu
-    sf::Vector2i targetTileCoordsPlayer1(21, 1); // Column, Row
-    sf::Vector2i targetTileCoordsPlayer2(19, 1); // Column, Row
+    sf::Vector2i targetTileCoordsPlayer1(34, 5);
+    sf::Vector2i targetTileCoordsPlayer2(35, 5);
 
     // Create sf::RectangleShape for visual representation
     sf::RectangleShape targetRectPlayer1Visual(sf::Vector2f(tileSize, tileSize));
@@ -1165,12 +1163,31 @@ bool runLevel3(sf::RenderWindow& window, sf::Font& font) {
     targetRectPlayer2Visual.setFillColor(sf::Color(0, 0, 255, 100));
 
     // Create sf::FloatRect for collision detection (same as before)
-    sf::FloatRect targetRectPlayer1Collision(targetTileCoordsPlayer1.x * tileSize, targetTileCoordsPlayer1.y * tileSize, tileSize, tileSize);
-    sf::FloatRect targetRectPlayer2Collision(targetTileCoordsPlayer2.x * tileSize, targetTileCoordsPlayer2.y * tileSize, tileSize, tileSize);
+    sf::FloatRect targetRectPlayer1Collision(targetRectPlayer1Visual.getGlobalBounds());
+    sf::FloatRect targetRectPlayer2Collision(targetRectPlayer2Visual.getGlobalBounds());
 
     bool player1OnTarget = false;
     bool player2OnTarget = false;
     bool levelCompleted = false;
+
+    // Definicja windy
+    sf::RectangleShape elevator(sf::Vector2f(96.f, 20.f));
+    elevator.setFillColor(sf::Color::Blue);
+    float elevatorTopY = 512.f; // Górna pozycja windy (na poziomie platformy)
+    float elevatorBottomY = 620.f; // Dolna pozycja windy (na poziomie ziemi)
+    elevator.setPosition(448.f, elevatorBottomY);
+
+    const float elevatorSpeed = 150.f;      // Prędkość wznoszenia
+    const float elevatorGravity = 100.f;    // Prędkość opadania (grawitacja)
+
+    // Definicja przycisków
+    sf::RectangleShape buttonDown(sf::Vector2f(40.f, 10.f));
+    buttonDown.setFillColor(sf::Color::Green);
+    buttonDown.setPosition((6 * tileSize), 20 * tileSize - buttonDown.getSize().y); // Na ziemi
+
+    sf::RectangleShape buttonUp(sf::Vector2f(40.f, 10.f));
+    buttonUp.setFillColor(sf::Color::Green);
+    buttonUp.setPosition( (6 * tileSize), (16 * tileSize) - buttonUp.getSize().y + 0); // Na górnej platformie
 
     // Generowanie okna pauzowania
     sf::RectangleShape pauseBox(sf::Vector2f(300, 200));
@@ -1219,9 +1236,8 @@ bool runLevel3(sf::RenderWindow& window, sf::Font& font) {
     backToMenuText.setOrigin(backToMenuBounds.width / 2.f, backToMenuBounds.height / 2.f);
     backToMenuText.setPosition(window.getSize().x / 2.f, window.getSize().y / 2.f + 80);
 
-
     //============================================================
-    //=======================Pętla poziomu 2======================
+    //=======================Pętla poziomu 3======================
     //============================================================
     while (window.isOpen() && !backToMenu) {
         float dt = clock.restart().asSeconds();
@@ -1288,10 +1304,8 @@ bool runLevel3(sf::RenderWindow& window, sf::Font& font) {
             window.clear();
             if (hasBackground) window.draw(background);
             window.draw(gameOverText);
-
-            //restartText.setFillColor(gameOverOption == 0 ? sf::Color::Red : sf::Color::White);
-            backToMenuText.setFillColor(gameOverOption == 1 ? sf::Color::Red : sf::Color::White);
-
+            restartText.setFillColor(gameOverOption == 0 ? sf::Color::Red : sf::Color::White);
+            //backToMenuText.setFillColor(gameOverOption == 1 ? sf::Color::Red : sf::Color::White);
             //window.draw(restartText);
             window.draw(backToMenuText);
             window.display();
@@ -1302,27 +1316,21 @@ bool runLevel3(sf::RenderWindow& window, sf::Font& font) {
             window.clear();
             if (hasBackground) window.draw(background);
             window.draw(pauseBox);
-
             resumeText.setFillColor(pauseOption == 0 ? sf::Color::Yellow : sf::Color::White);
             volumeText.setFillColor(pauseOption == 1 ? sf::Color::Yellow : sf::Color::White);
             exitText.setFillColor(pauseOption == 2 ? sf::Color::Yellow : sf::Color::White);
-
             window.draw(resumeText);
             window.draw(volumeText);
-
             window.draw(volumeBar);
             volumeKnob.setPosition(
                 volumeBar.getPosition().x + (volume / 100.f) * volumeBar.getSize().x - volumeKnob.getRadius(),
                 volumeBar.getPosition().y + volumeBar.getSize().y / 2.f - volumeKnob.getRadius()
                 );
-
             window.draw(volumeKnob);
-
             window.draw(exitText);
             window.display();
             continue;
         }
-
 
         // Sterowanie dla gracza 1
         int horizontalPlayer1 = 0;
@@ -1341,29 +1349,87 @@ bool runLevel3(sf::RenderWindow& window, sf::Font& font) {
         // Aktualizacja stanu graczy
         player.update(horizontalPlayer1, jumpPlayer1, dt);
         player2.update(horizontalPlayer2, jumpPlayer2, dt);
-
-        // Aktualizacja stanu NPC
         npc.update(dt);
+
+        //logika dla widny
+        bool buttonPressed = player.getGlobalBounds().intersects(buttonDown.getGlobalBounds()) ||
+                             player2.getGlobalBounds().intersects(buttonDown.getGlobalBounds()) ||
+                             player.getGlobalBounds().intersects(buttonUp.getGlobalBounds()) ||
+                             player2.getGlobalBounds().intersects(buttonUp.getGlobalBounds());
+
+        sf::Vector2f elevatorMovement(0.f, 0.f);
+        sf::Vector2f elevatorOldPos = elevator.getPosition();
+
+        if (buttonPressed) {
+            buttonDown.setFillColor(sf::Color::Red);
+            buttonUp.setFillColor(sf::Color::Red);
+            elevatorMovement.y = -elevatorSpeed * dt;
+        } else {
+            buttonDown.setFillColor(sf::Color::Green);
+            buttonUp.setFillColor(sf::Color::Green);
+            elevatorMovement.y = elevatorGravity * dt;
+        }
+
+        elevator.move(elevatorMovement);
+
+        if (elevator.getPosition().y < elevatorTopY) {
+            elevator.setPosition(elevator.getPosition().x, elevatorTopY);
+        }
+        if (elevator.getPosition().y > elevatorBottomY) {
+            elevator.setPosition(elevator.getPosition().x, elevatorBottomY);
+        }
+
+        sf::Vector2f finalElevatorDisplacement = elevator.getPosition() - elevatorOldPos;
 
         // Interakcje ze ścianami dla graczy, pocisków i NPC
         resolveCollisions(player, solidTiles);
         resolveCollisions(player2, solidTiles);
         resolveCollisions(npc, solidTiles);
 
+        // Kolizja graczy z windą
+        auto handleElevatorCollision = [&](Character& character, const sf::Vector2f& elevDisplacement) {
+            sf::FloatRect charBounds = character.getGlobalBounds();
+            sf::FloatRect elevatorBounds = elevator.getGlobalBounds();
+
+            if (charBounds.intersects(elevatorBounds)) {
+                float charBottom = charBounds.top + charBounds.height;
+                float overlapY = charBottom - elevatorBounds.top;
+
+                if (character.getVelocity().y >= 0 && overlapY > 0 && overlapY < 20.f) {
+                    character.setPosition(character.getPosition().x, elevatorBounds.top - charBounds.height);
+                    character.setGroundContact(true);
+                    character.setVelocity(character.getVelocity().x, 0);
+                    character.sf::Sprite::move(elevDisplacement);
+                }
+                else if (character.getVelocity().y < 0 && charBounds.top > elevatorBounds.top) {
+                    character.setVelocity(character.getVelocity().x, 0);
+                    character.setPosition(character.getPosition().x, elevatorBounds.top + elevatorBounds.height);
+                }
+                else {
+                    if (character.getVelocity().x > 0) {
+                        character.setPosition(elevatorBounds.left - charBounds.width, character.getPosition().y);
+                    } else if (character.getVelocity().x < 0) {
+                        character.setPosition(elevatorBounds.left + elevatorBounds.width, character.getPosition().y);
+                    }
+                }
+            }
+        };
+
+        handleElevatorCollision(player, finalElevatorDisplacement);
+        handleElevatorCollision(player2, finalElevatorDisplacement);
+
         // Kolizje pocisków z NPC
         for (auto& bullet : npc.getBullets()) {
             bullet.update(dt);
             resolveCollisions(bullet, solidTiles);
-            // Sprawdzenie kolizji pocisku z graczem 1
             if (bullet.getGlobalBounds().intersects(player.getGlobalBounds())) {
                 bullet.deactive();
-                gameOver = true; // Ustaw flagę GAME OVER
+                gameOver = true;
                 levelTimer.pause();
             }
-            // Sprawdzenie kolizji pocisku z graczem 2
             if (bullet.getGlobalBounds().intersects(player2.getGlobalBounds())) {
                 bullet.deactive();
-                gameOver = true; // Ustaw flagę GAME OVER
+                gameOver = true;
                 levelTimer.pause();
             }
         }
@@ -1379,6 +1445,7 @@ bool runLevel3(sf::RenderWindow& window, sf::Font& font) {
             if (player.getVelocity().y > 0 && overlapY < 20.f) {
                 player.setVelocity(player.getVelocity().x, -250.f);
                 player.setGroundContact(false);
+                // W tym miejscu można by dodać np. usunięcie NPC
             } else {
                 gameOver = true;
                 levelTimer.pause();
@@ -1394,12 +1461,12 @@ bool runLevel3(sf::RenderWindow& window, sf::Font& font) {
             if (player2.getVelocity().y > 0 && overlapY < 20.f) {
                 player2.setVelocity(player2.getVelocity().x, -250.f);
                 player2.setGroundContact(false);
+                    // W tym miejscu można by dodać np. usunięcie NPC
             } else {
                 gameOver = true;
                 levelTimer.pause();
             }
         }
-
 
         //sprawdzanie warunkow ukonczenia poziomu. czy obie postacie sa na miejscach konczowcyh
         player1OnTarget = player.getGlobalBounds().intersects(targetRectPlayer1Collision);
@@ -1407,8 +1474,8 @@ bool runLevel3(sf::RenderWindow& window, sf::Font& font) {
         if (player1OnTarget && player2OnTarget) {
             levelCompleted = true;
             levelTimer.pause();
+            // Tutaj można dodać logikę przejścia do następnego poziomu lub ekranu zwycięstwa
         }
-
 
         // Aktualizacja stanu dla pocisków strzelanych przez NPC
         auto& bullets = npc.getBullets();
@@ -1426,7 +1493,7 @@ bool runLevel3(sf::RenderWindow& window, sf::Font& font) {
             bullets.end()
             );
 
-
+        // Rysowanie
         window.clear(sf::Color(50, 50, 50));
         if (hasBackground) window.draw(background);
 
@@ -1442,6 +1509,10 @@ bool runLevel3(sf::RenderWindow& window, sf::Font& font) {
                 }
             }
         }
+        window.draw(buttonDown);
+        window.draw(buttonUp);
+        window.draw(elevator);
+
         window.draw(player);
         window.draw(player2);
         window.draw(npc);
@@ -1454,7 +1525,6 @@ bool runLevel3(sf::RenderWindow& window, sf::Font& font) {
 
         timerText.setString("Time left: " + levelTimer.getFormattedTime());
         window.draw(timerText);
-
 
         window.display();
     }
