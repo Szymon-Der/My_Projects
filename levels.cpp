@@ -38,13 +38,59 @@ LevelMap generateLevel(int levelNumber, const sf::RenderWindow& window) {
 }
 
 bool runLevel1(sf::RenderWindow& window, sf::Font& font) {
+
+
+    int lives = 3;
+    sf::Texture heartTex;
+    if (!heartTex.loadFromFile("Images/heart.png")) {
+        std::cerr << "Nie można załadować Images/heart.png\n";
+    }
+    const float heartScale = 0.1f;
+    const float spacing   = 3.f;             // mniejszy odstęp
+    const float margin    = 8.f;             // lekko mniejszy margines
+
+    sf::Vector2f heartSize(
+        heartTex.getSize().x * heartScale,
+        heartTex.getSize().y * heartScale
+        );
+
+    sf::Texture starTex;
+    if (!starTex.loadFromFile("Images/star.png")) {
+        std::cerr << "Nie można załadować Images/star.png\n";
+    }
+    const float starScale    = 0.2f;                  // taki sam jak serduszka :contentReference[oaicite:0]{index=0}
+    const float starSpacing  = 10.f;
+    const float starOffsetY  = 60.f;
+
+    std::vector<sf::Sprite> hearts;
+    for (int i = 0; i < lives; ++i) {
+        sf::Sprite heart(heartTex);
+        heart.setScale(heartScale, heartScale);
+        float x = window.getSize().x
+                  - margin
+                  - heartSize.x * (i + 1)
+                  - spacing * i;
+        float y = margin;
+        heart.setPosition(x, y);
+        hearts.push_back(heart);
+    }
+
+    sf::Clock hitClock;
+    bool invincible = false;
+    const sf::Time invincibilityDuration = sf::seconds(1.f);
+
     // Generowanie postaci
-    Character player("Characters/Character 9.png");
-    Character player2("Characters/Character 1.png");
+    Character player("Characters/Character 9.png"); //POMARANCZOWY
+    Character player2("Characters/Character 1.png"); //CZARNY
     NPC npc("Characters/Mushroom.png", false, std::make_pair(100.f, 300.f));
     NPC npc2("Characters/Mushroom.png", false, std::make_pair(400.f, 600.f));
     NPC npc3("Characters/Mushroom.png", false, std::make_pair(200.f, 350.f));
     NPC npc4("Characters/Mushroom.png", false, std::make_pair(800.f, 1200.f));
+
+    sf::SoundBuffer beepBuf, gameoverBuf;
+    beepBuf.loadFromFile("Sounds/beep.wav");
+    gameoverBuf.loadFromFile("Sounds/gameover.wav");
+    sf::Sound beepSound(beepBuf), gameoverSound(gameoverBuf);
 
     // Ustawienie początkowych pozycji postaci
     player.setPosition(100.f, 549.f);
@@ -56,6 +102,7 @@ bool runLevel1(sf::RenderWindow& window, sf::Font& font) {
 
     sf::Clock clock;
     Timer levelTimer(50);  // 3 minuty = 180 sekund
+    const float totalTime = 50.f;
 
     bool backToMenu = false;
     bool paused = false;
@@ -77,6 +124,12 @@ bool runLevel1(sf::RenderWindow& window, sf::Font& font) {
         backgroundMusic.setLoop(true);
         backgroundMusic.play();
     }
+
+    sf::Texture levelPassedBgTex;
+    if (!levelPassedBgTex.loadFromFile("Images/bg1.png")) {
+        std::cerr << "Nie można załadować Images/bg1.png\n";
+    }
+    sf::Sprite levelPassedBg(levelPassedBgTex);
 
     // Sekwencja wczytania tła dla aktualnego poziomu
     sf::Texture backgroundTexture;
@@ -166,8 +219,8 @@ bool runLevel1(sf::RenderWindow& window, sf::Font& font) {
     }
 
     //obsluga ukonczenia poziomu
-    sf::Vector2i targetTileCoordsPlayer1(21, 3); // Column, Row
-    sf::Vector2i targetTileCoordsPlayer2(19, 2); // Column, Row
+    sf::Vector2i targetTileCoordsPlayer1(21, 19); // Column, Row 3
+    sf::Vector2i targetTileCoordsPlayer2(19, 19); // Column, Row 2
 
     // Create sf::RectangleShape for visual representation
     sf::RectangleShape targetRectPlayer1Visual(sf::Vector2f(tileSize, tileSize));
@@ -221,6 +274,25 @@ bool runLevel1(sf::RenderWindow& window, sf::Font& font) {
     gameOverText.setOrigin(goBounds.width / 2.f, goBounds.height / 2.f);
     gameOverText.setPosition(window.getSize().x / 2.f, window.getSize().y / 2.f - 80);
 
+    // tekst „LEVEL PASSED”
+    sf::Text levelPassedText("LEVEL PASSED", font, 48);
+    levelPassedText.setFillColor(sf::Color::White);
+    auto lpb = levelPassedText.getLocalBounds();
+    levelPassedText.setOrigin(lpb.width/2.f, lpb.height/2.f);
+    levelPassedText.setPosition(
+        window.getSize().x/2.f,
+        window.getSize().y * 0.25f
+        );
+
+    sf::Text nextLevelText("Go to next level", font, 32);  // większy rozmiar czcionki
+    nextLevelText.setFillColor(sf::Color::Red);            // czerwone podświetlenie
+    nextLevelText.setStyle(sf::Text::Bold);                // pogrubienie
+    auto nlb = nextLevelText.getLocalBounds();
+    nextLevelText.setOrigin(nlb.width/2.f, nlb.height/2.f);
+    nextLevelText.setPosition(
+        window.getSize().x/2.f,
+        window.getSize().y * 0.75f
+        );
     sf::Text restartText("RESTART", font, 36);
     restartText.setFillColor(sf::Color::White);
     sf::FloatRect restartBounds = restartText.getLocalBounds();
@@ -233,15 +305,9 @@ bool runLevel1(sf::RenderWindow& window, sf::Font& font) {
     backToMenuText.setOrigin(backToMenuBounds.width / 2.f, backToMenuBounds.height / 2.f);
     backToMenuText.setPosition(window.getSize().x / 2.f, window.getSize().y / 2.f + 80);
 
-    // Wczytanie dźwięków
-    sf::SoundBuffer beepBuf, gameoverBuf;
-    if (!beepBuf.loadFromFile("Sounds/beep.wav")) std::cerr << "Nie można załadować beep.wav\n";
-    if (!gameoverBuf.loadFromFile("Sounds/gameover.wav")) std::cerr << "Nie można załadować gameover.wav\n";
-    sf::Sound beepSound(beepBuf), gameoverSound(gameoverBuf);
-
     int lastBeepSecond = -1;
     bool gameoverPlayed = false;
-
+    std::vector<sf::Sprite> stars;
 
     //============================================================
     //=======================Pętla poziomu 1======================
@@ -249,8 +315,21 @@ bool runLevel1(sf::RenderWindow& window, sf::Font& font) {
     while (window.isOpen() && !backToMenu) {
         float dt = clock.restart().asSeconds();
         sf::Event event;
+
+        if (invincible && hitClock.getElapsedTime() >= invincibilityDuration) {
+            invincible = false;
+        }
+
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) window.close();
+
+            if (levelCompleted
+                && event.type == sf::Event::KeyPressed
+                && event.key.code == sf::Keyboard::Enter)
+            {
+                return true;
+            }
+
             if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape) {
                 if (!gameOver) { // Tylko jeśli gra nie jest w stanie GAME OVER
                     paused = !paused;
@@ -307,6 +386,21 @@ bool runLevel1(sf::RenderWindow& window, sf::Font& font) {
             }
         }
 
+        auto handleHit = [&](){
+            if (invincible) return;         // jeśli jeszcze w fazie nietykalności, ignorujemy
+            lives--;
+            invincible = true;
+            hitClock.restart();
+            if (lives <= 0) {
+                gameOver = true;
+                levelTimer.pause();
+                gameoverSound.play();
+            } else {
+                beepSound.play();
+                hearts.pop_back();
+            }
+        };
+
         if (gameOver) {
             window.clear();
             if (hasBackground) window.draw(background);
@@ -343,6 +437,55 @@ bool runLevel1(sf::RenderWindow& window, sf::Font& font) {
 
             window.draw(exitText);
             window.display();
+            continue;
+        }
+
+        if (levelCompleted) {
+            // 1) Obsługa zdarzeń: zamknij okno lub przejdź do wyboru poziomu po Enter
+            sf::Event event;
+            while (window.pollEvent(event)) {
+                if (event.type == sf::Event::Closed) {
+                    window.close();
+                }
+                if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Enter) {
+                    return true;
+                    // informujemy callera, że ma pokazać menu wyboru leveli
+                }
+            }
+
+            // 2) Generowanie gwiazdek tylko raz
+            if (stars.empty()) {
+                float remaining = levelTimer.getRemainingSeconds();
+                float ratio     = remaining / totalTime;     // totalTime to stała zainicjalizowana obok levelTimer
+                int starCount   = (ratio > 0.4f ? 3 : (ratio > 0.2f ? 2 : 1));
+
+                sf::Vector2f sz(
+                    starTex.getSize().x * starScale,
+                    starTex.getSize().y * starScale
+                    );
+                float startX = window.getSize().x/2.f
+                               - (starCount * sz.x + (starCount - 1) * starSpacing) / 2.f;
+                float y = window.getSize().y * 0.25f + starOffsetY;
+
+                for (int i = 0; i < starCount; ++i) {
+                    sf::Sprite star(starTex);
+                    star.setScale(starScale, starScale);
+                    star.setPosition(startX + i * (sz.x + starSpacing), y);
+                    stars.push_back(star);
+                }
+            }
+
+            // 3) Rysowanie tła, napisu, gwiazdek i opcji przejścia
+            window.clear();
+            window.draw(levelPassedBg);      // sprite wczytany z Images/bg1.png
+            window.draw(levelPassedText);    // tekst "LEVEL PASSED"
+            for (auto& s : stars) {
+                window.draw(s);
+            }
+            window.draw(nextLevelText);      // tekst "Go to next level"
+            window.display();
+
+            // Pomijamy resztę logiki w tej klatce
             continue;
         }
 
@@ -423,8 +566,7 @@ bool runLevel1(sf::RenderWindow& window, sf::Font& font) {
                 player.setVelocity(player.getVelocity().x, -250.f);
                 player.setGroundContact(false);
             } else {
-                gameOver = true;
-                levelTimer.pause();
+                handleHit();
             }
         }
 
@@ -436,8 +578,7 @@ bool runLevel1(sf::RenderWindow& window, sf::Font& font) {
                 player.setVelocity(player.getVelocity().x, -250.f);
                 player.setGroundContact(false);
             } else {
-                gameOver = true;
-                levelTimer.pause();
+                handleHit();
             }
         }
 
@@ -449,8 +590,7 @@ bool runLevel1(sf::RenderWindow& window, sf::Font& font) {
                 player.setVelocity(player.getVelocity().x, -250.f);
                 player.setGroundContact(false);
             } else {
-                gameOver = true;
-                levelTimer.pause();
+                handleHit();
             }
         }
 
@@ -462,8 +602,7 @@ bool runLevel1(sf::RenderWindow& window, sf::Font& font) {
                 player.setVelocity(player.getVelocity().x, -250.f);
                 player.setGroundContact(false);
             } else {
-                gameOver = true;
-                levelTimer.pause();
+                handleHit();
             }
         }
 
@@ -477,8 +616,7 @@ bool runLevel1(sf::RenderWindow& window, sf::Font& font) {
                 player2.setVelocity(player2.getVelocity().x, -250.f);
                 player2.setGroundContact(false);
             } else {
-                gameOver = true;
-                levelTimer.pause();
+                handleHit();
             }
         }
 
@@ -490,8 +628,7 @@ bool runLevel1(sf::RenderWindow& window, sf::Font& font) {
                 player2.setVelocity(player2.getVelocity().x, -250.f);
                 player2.setGroundContact(false);
             } else {
-                gameOver = true;
-                levelTimer.pause();
+                handleHit();
             }
         }
 
@@ -503,8 +640,7 @@ bool runLevel1(sf::RenderWindow& window, sf::Font& font) {
                 player2.setVelocity(player2.getVelocity().x, -250.f);
                 player2.setGroundContact(false);
             } else {
-                gameOver = true;
-                levelTimer.pause();
+                handleHit();
             }
         }
 
@@ -516,8 +652,7 @@ bool runLevel1(sf::RenderWindow& window, sf::Font& font) {
                 player2.setVelocity(player2.getVelocity().x, -250.f);
                 player2.setGroundContact(false);
             } else {
-                gameOver = true;
-                levelTimer.pause();
+                handleHit();
             }
         }
 
@@ -572,6 +707,9 @@ bool runLevel1(sf::RenderWindow& window, sf::Font& font) {
         for (auto& bullet : bullets) {
             window.draw(bullet);
         }
+        for (auto& h : hearts) {
+            window.draw(h);
+        }
 
         window.draw(targetRectPlayer1Visual);
         window.draw(targetRectPlayer2Visual);
@@ -585,6 +723,7 @@ bool runLevel1(sf::RenderWindow& window, sf::Font& font) {
 
     return true;
 }
+
 
 //============================================================
 //===========================LVL2=============================
