@@ -4,41 +4,54 @@
 #include <map>
 #include <iomanip>
 
-void updatePlayTime(const std::string& playerName, int seconds) {
-    std::map<std::string, int> players;
+struct Record {
+    int totalTime;
+    int lvlTime[3];
+};
 
+static std::map<std::string,Record> loadAll() {
     std::ifstream in("csv/players.csv");
     std::string line;
-    while (std::getline(in, line)) {
+    std::map<std::string,Record> m;
+    while (std::getline(in,line)) {
         std::stringstream ss(line);
         std::string name;
-        int time;
-        if (std::getline(ss, name, ',') && ss >> time) {
-            players[name] = time;
+        Record r{0,{0,0,0}};
+        char comma;
+        // parsujemy: name,total,l1,l2,l3
+        if (std::getline(ss,name,',')
+            && ss >> r.totalTime
+            && ss >> comma >> r.lvlTime[0]
+            && ss >> comma >> r.lvlTime[1]
+            && ss >> comma >> r.lvlTime[2])
+        {
+            m[name] = r;
         }
     }
-    in.close();
+    return m;
+}
 
-    players[playerName] += seconds;
-
+static void saveAll(const std::map<std::string,Record>& m) {
     std::ofstream out("csv/players.csv");
-    for (const auto& [name, time] : players) {
-        out << name << "," << time << "\n";
+    for (auto& [name,r] : m) {
+        out << name << ","
+            << r.totalTime << ","
+            << r.lvlTime[0] << ","
+            << r.lvlTime[1] << ","
+            << r.lvlTime[2]
+            << "\n";
     }
 }
 
+void updatePlayTime(const std::string& playerName, int seconds) {
+    auto m = loadAll();
+    m[playerName].totalTime += seconds;
+    saveAll(m);
+}
+
 int readPlayTime(const std::string& playerName) {
-    std::ifstream in("csv/players.csv");
-    std::string line;
-    while (std::getline(in, line)) {
-        std::stringstream ss(line);
-        std::string name;
-        int time;
-        if (std::getline(ss, name, ',') && ss >> time) {
-            if (name == playerName)
-                return time;
-        }
-    }
+    auto m = loadAll();
+    if (m.count(playerName)) return m[playerName].totalTime;
     return 0;
 }
 
@@ -51,4 +64,18 @@ std::string formatTime(int totalSeconds) {
         << std::setw(2) << std::setfill('0') << m << ":"
         << std::setw(2) << std::setfill('0') << s;
     return oss.str();
+}
+
+int readLevelTime(const std::string& playerName, int levelNumber) {
+    auto m = loadAll();
+    if (m.count(playerName) && levelNumber >= 1 && levelNumber <= 3)
+        return m[playerName].lvlTime[levelNumber-1];
+    return 0;
+}
+
+void updateLevelTime(const std::string& playerName, int levelNumber, int elapsedSeconds) {
+    auto m = loadAll();
+    if (!m.count(playerName) || levelNumber < 1 || levelNumber > 3) return;
+    m[playerName].lvlTime[levelNumber-1] = elapsedSeconds;
+    saveAll(m);
 }

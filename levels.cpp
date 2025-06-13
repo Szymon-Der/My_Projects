@@ -1,6 +1,7 @@
 #include "levels.h"
 #include "characters.h"
 #include "timer.h"
+#include "playtime.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 #include <iostream>
@@ -37,7 +38,7 @@ LevelMap generateLevel(int levelNumber, const sf::RenderWindow& window) {
     return level;
 }
 
-bool runLevel1(sf::RenderWindow& window, sf::Font& font) {
+bool runLevel1(sf::RenderWindow& window, sf::Font& font, const std::string& playerName) {
 
 
     int lives = 3;
@@ -85,7 +86,7 @@ bool runLevel1(sf::RenderWindow& window, sf::Font& font) {
     NPC npc("Characters/Mushroom.png", false, std::make_pair(100.f, 300.f));
     NPC npc2("Characters/Mushroom.png", false, std::make_pair(400.f, 600.f));
     NPC npc3("Characters/Mushroom.png", false, std::make_pair(200.f, 350.f));
-    NPC npc4("Characters/Mushroom.png", false, std::make_pair(800.f, 1200.f));
+    NPC npc4("Characters/Mushroom.png", false, std::make_pair(800.f, 1000.f));
 
     sf::SoundBuffer beepBuf, gameoverBuf;
     beepBuf.loadFromFile("Sounds/beep.wav");
@@ -98,7 +99,7 @@ bool runLevel1(sf::RenderWindow& window, sf::Font& font) {
     npc.setPosition(150.f, 449.f);
     npc2.setPosition(550.f, 300.f);
     npc3.setPosition(250.f, 200.f);
-    npc4.setPosition(1000.f, 300.f);
+    npc4.setPosition(900.f, 300.f);
 
     sf::Clock clock;
     Timer levelTimer(50);  // 3 minuty = 180 sekund
@@ -219,8 +220,8 @@ bool runLevel1(sf::RenderWindow& window, sf::Font& font) {
     }
 
     //obsluga ukonczenia poziomu
-    sf::Vector2i targetTileCoordsPlayer1(21, 19); // Column, Row 3
-    sf::Vector2i targetTileCoordsPlayer2(19, 19); // Column, Row 2
+    sf::Vector2i targetTileCoordsPlayer1(21, 19); // Column, Row 3 19
+    sf::Vector2i targetTileCoordsPlayer2(19, 19); // Column, Row 2 19
 
     // Create sf::RectangleShape for visual representation
     sf::RectangleShape targetRectPlayer1Visual(sf::Vector2f(tileSize, tileSize));
@@ -293,6 +294,7 @@ bool runLevel1(sf::RenderWindow& window, sf::Font& font) {
         window.getSize().x/2.f,
         window.getSize().y * 0.75f
         );
+
     sf::Text restartText("RESTART", font, 36);
     restartText.setFillColor(sf::Color::White);
     sf::FloatRect restartBounds = restartText.getLocalBounds();
@@ -401,19 +403,18 @@ bool runLevel1(sf::RenderWindow& window, sf::Font& font) {
             }
         };
 
-        if (gameOver) {
+           if (gameOver) {
             window.clear();
-            if (hasBackground) window.draw(background);
+                      // rysujemy tło Game Over z Images/bg1.png
+             window.draw(levelPassedBg);    // <- sprite wczytany z Images/bg1.png
             window.draw(gameOverText);
-
-            //restartText.setFillColor(gameOverOption == 0 ? sf::Color::Red : sf::Color::White);
-            backToMenuText.setFillColor(gameOverOption == 1 ? sf::Color::Red : sf::Color::White);
-
-            //window.draw(restartText);
-            window.draw(backToMenuText);
-            window.display();
-            continue;
-        }
+            backToMenuText.setFillColor(
+            gameOverOption == 1 ? sf::Color::Red : sf::Color::White
+              );
+             window.draw(backToMenuText);
+             window.display();
+              continue;
+             }
 
         if (paused) {
             window.clear();
@@ -496,10 +497,12 @@ bool runLevel1(sf::RenderWindow& window, sf::Font& font) {
             lastBeepSecond = rem;
         }
         // na zero raz – dźwięk końca gry
-        if (rem == 0 && !gameoverPlayed) {
-            gameoverSound.play();
-            gameoverPlayed = true;
-        }
+         if (rem == 0 && !gameoverPlayed) {
+            gameOver = true;             // <--- włączamy stan Game Over
+            levelTimer.pause();          // <--- pauzujemy timer
+             gameoverSound.play();        // <--- sound raz
+             gameoverPlayed = true;
+         }
 
         // Sterowanie dla gracza 1
         int horizontalPlayer1 = 0;
@@ -663,6 +666,12 @@ bool runLevel1(sf::RenderWindow& window, sf::Font& font) {
         if (player1OnTarget && player2OnTarget) {
             levelCompleted = true;
             levelTimer.pause();
+            static bool recorded = false;
+            if (levelCompleted && !recorded) {
+                int elapsed = static_cast<int>( totalTime - levelTimer.getRemainingSeconds() );
+                updateLevelTime(playerName, 1, elapsed);
+                recorded = true;
+            }
         }
 
 
@@ -729,7 +738,7 @@ bool runLevel1(sf::RenderWindow& window, sf::Font& font) {
 //===========================LVL2=============================
 //============================================================
 
-bool runLevel2(sf::RenderWindow& window, sf::Font& font) {
+bool runLevel2(sf::RenderWindow& window, sf::Font& font, const std::string& playerName) {
     // Generowanie postaci
     Character player("Characters/Character 9.png");
     Character player2("Characters/Character 1.png");
@@ -1168,7 +1177,7 @@ bool runLevel2(sf::RenderWindow& window, sf::Font& font) {
 
 
 
-bool runLevel3(sf::RenderWindow& window, sf::Font& font) {
+bool runLevel3(sf::RenderWindow& window, sf::Font& font, const std::string& playerName) {
     // Generowanie postaci
     Character player("Characters/Character 9.png");
     Character player2("Characters/Character 1.png");

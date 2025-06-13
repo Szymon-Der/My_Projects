@@ -500,7 +500,7 @@ void Menu::inputPlayerName() {
                     messageText.setString("Welcome back, " + name + "!");
                 } else {
                     std::ofstream outFile("csv/players.csv", std::ios::app);
-                    outFile << name << "\n";
+                    outFile << name << ",0,0,0,0\n";
                     outFile.close();
                     messageText.setString("Nice to meet you, " + name + "! Welcome!");
                 }
@@ -582,10 +582,18 @@ int Menu::selectLevel() {
         {"3", "HARD",   "Images/level3.png"}
     };
 
+    sf::Texture starTex;
+    if (!starTex.loadFromFile("Images/star.png")) {
+        std::cerr << "Nie można załadować Images/star.png\n";
+    }
+    const float starScale   = 0.15f;
+    const float starSpacing = 8.f;
+
     std::vector<sf::RectangleShape> boxes;
     std::vector<sf::Text> numberTexts;
     std::vector<sf::Text> nameTexts;
     std::vector<sf::Texture> textures;
+
 
     float boxWidth = 200.f;
     float boxHeight = 200.f;
@@ -668,6 +676,28 @@ int Menu::selectLevel() {
             m_window.draw(boxes[i]);
             m_window.draw(numberTexts[i]);
             m_window.draw(nameTexts[i]);
+            int lvl     = static_cast<int>(i) + 1;
+            int elapsed = readLevelTime(m_playerName, lvl);
+            if (elapsed > 0) {
+                float total = (lvl == 1 ? 50.f : 180.f);
+                float ratio = (total - elapsed) / total;
+                int starCnt = (ratio > 0.4f ? 3 : (ratio > 0.2f ? 2 : 1));
+
+                float sw     = starTex.getSize().x * starScale;
+                float startX = boxes[i].getPosition().x
+                               + (boxWidth - (starCnt*sw + (starCnt-1)*starSpacing)) / 2.f;
+                float sy     = boxes[i].getPosition().y   // y pudełka
+                           - sw                       // wysokość gwiazdki
+                           - 10.f;                    // 10px odstępu nad boxem
+
+                for (int s = 0; s < starCnt; ++s) {
+                    sf::Sprite st(starTex);
+                    st.setScale(starScale, starScale);
+                    st.setPosition(startX + s*(sw + starSpacing), sy);
+                    m_window.draw(st);
+                }
+            }
+
         }
         // Komunikat „ESC to return to menu” na dole ekranu
         sf::Text footer("Press ESC to return to menu", m_font, 20);

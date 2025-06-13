@@ -10,9 +10,9 @@ struct LevelMap {
 };
 
 LevelMap generateLevel(int levelNumber, const sf::RenderWindow& window);
-bool runLevel1(sf::RenderWindow& window, sf::Font& font);
-bool runLevel2(sf::RenderWindow& window, sf::Font& font);
-bool runLevel3(sf::RenderWindow& window, sf::Font& font);
+bool runLevel1(sf::RenderWindow& window, sf::Font& font, const std::string& playerName);
+bool runLevel2(sf::RenderWindow& window, sf::Font& font, const std::string& playerName);
+bool runLevel3(sf::RenderWindow& window, sf::Font& font, const std::string& playerName);
 //bool runLevelGeneric(sf::RenderWindow& window, sf::Font& font, const sf::Texture& backgroundTexture);
 
 

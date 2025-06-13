@@ -46,9 +46,9 @@ int main() {
             bool goBackToLevelSelect = false;
 
             switch (selectedLevel) {
-            case 1: goBackToLevelSelect = runLevel1(window, font); break;
-            case 2: goBackToLevelSelect = runLevel2(window, font); break;
-            case 3: goBackToLevelSelect = runLevel3(window, font); break;
+            case 1: goBackToLevelSelect = runLevel1(window, font, playerName); break;
+            case 2: goBackToLevelSelect = runLevel2(window, font, playerName); break;
+            case 3: goBackToLevelSelect = runLevel3(window, font, playerName); break;
             default: break;
             }
 
