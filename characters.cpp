@@ -7,7 +7,7 @@
 //konstrukotr nadajacy wartosci fizyczne oraz przypisujacy plik z textura jako zmienna
 Character::Character(const std::string& texturePath) :
     isOnGround(false), facingRight(true), moveSpeed(150.f),
-    jumpStrength(170.f), gravity(200.f), currentState(CharacterState::Static),
+    jumpStrength(245.f), gravity(350.f), currentState(CharacterState::Static),
     frameIndex(0), animationTimer(0.f), frameDuration(0.1f) {
     if(!texture.loadFromFile(texturePath)){
         std::cerr << "blad ladowania textury z pliku: " << texturePath << std::endl;

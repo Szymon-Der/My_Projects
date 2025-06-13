@@ -119,16 +119,16 @@ bool runLevel1(sf::RenderWindow& window, sf::Font& font, const std::string& play
     timerText.setPosition(20, 20);  // Dowolna pozycja w rogu
 
     sf::Music backgroundMusic;
-    if (!backgroundMusic.openFromFile("Sounds/music.mp3")) {
-        std::cerr << "Nie można załadować muzyki z Sounds/music.mp3\n";
+    if (!backgroundMusic.openFromFile("Sounds/music.wav")) {
+        std::cerr << "Nie można załadować muzyki z Sounds/music.wav\n";
     } else {
         backgroundMusic.setLoop(true);
         backgroundMusic.play();
     }
 
     sf::Music winnerMusic;
-    if (!winnerMusic.openFromFile("Sounds/winner.mp3")) {
-        std::cerr << "Nie można załadować Sounds/winner.mp3\n";
+    if (!winnerMusic.openFromFile("Sounds/winner.wav")) {
+        std::cerr << "Nie można załadować Sounds/winner.wav\n";
     }
 
     sf::SoundBuffer lifeLostBuf;
@@ -232,8 +232,8 @@ bool runLevel1(sf::RenderWindow& window, sf::Font& font, const std::string& play
     }
 
     //obsluga ukonczenia poziomu
-    sf::Vector2i targetTileCoordsPlayer1(21, 19); // Column, Row 3 19
-    sf::Vector2i targetTileCoordsPlayer2(19, 19); // Column, Row 2 19
+    sf::Vector2i targetTileCoordsPlayer1(21, 3); // Column, Row 3 19
+    sf::Vector2i targetTileCoordsPlayer2(19, 2); // Column, Row 2 19
 
     // Create sf::RectangleShape for visual representation
     sf::RectangleShape targetRectPlayer1Visual(sf::Vector2f(tileSize, tileSize));
@@ -837,16 +837,16 @@ bool runLevel2(sf::RenderWindow& window, sf::Font& font, const std::string& play
     timerText.setPosition(20, 20);  // Dowolna pozycja w rogu
 
     sf::Music backgroundMusic;
-    if (!backgroundMusic.openFromFile("Sounds/music.mp3")) {
-        std::cerr << "Nie można załadować muzyki z Sounds/music.mp3\n";
+    if (!backgroundMusic.openFromFile("Sounds/music.wav")) {
+        std::cerr << "Nie można załadować muzyki z Sounds/music.wav\n";
     } else {
         backgroundMusic.setLoop(true);
         backgroundMusic.play();
     }
 
     sf::Music winnerMusic;
-    if (!winnerMusic.openFromFile("Sounds/winner.mp3")) {
-        std::cerr << "Nie można załadować Sounds/winner.mp3\n";
+    if (!winnerMusic.openFromFile("Sounds/winner.wav")) {
+        std::cerr << "Nie można załadować Sounds/winner.wav\n";
     }
 
     sf::SoundBuffer lifeLostBuf;
@@ -923,12 +923,12 @@ bool runLevel2(sf::RenderWindow& window, sf::Font& font, const std::string& play
         {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0, 0, 0,11}, // 6
         {27,33,33,33,33,33,33,33,33,33,33,33,34, 0, 0, 0, 0,32,33,33,45, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11}, // 7
         {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,55, 0, 0, 0, 0,32,33,33,33,33,33,33,33,33,33,33,33,33,33,17}, // 8
-        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 34, 0, 0, 0, 0,37, 34, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11}, // 9
+        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 34, 0, 0, 0,37, 34, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11}, // 9
         {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11}, // 10
         {13, 0, 0, 0,32,33,33,33,33,33,33,33,33,33,33,33,33,33,33,33,45, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11}, // 11
         {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,37,33,33,33,33,33,33,33,33,33,33,33,33,34, 0, 0, 0,32,33,17}, // 12
         {27,34,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11}, // 13
-        {13, 0, 0,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 34, 0, 0,11}, // 14
+        {13, 0, 0,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 34, 0,11}, // 14
         {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11}, // 15
         {27,33,33,33,33,33,33,33,33,33,33,33,33,33,33,34, 0, 0, 0, 0,55, 0, 0, 0, 0,32,33,33,33,33,33,33,33,33,33,33,33,33,33,17}, // 16
         {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11}, // 17
@@ -1275,14 +1275,12 @@ bool runLevel2(sf::RenderWindow& window, sf::Font& font, const std::string& play
             // Sprawdzenie kolizji pocisku z graczem 1
             if (bullet.getGlobalBounds().intersects(player.getGlobalBounds())) {
                 bullet.deactive();
-                gameOver = true; // Ustaw flagę GAME OVER
-                levelTimer.pause();
+                handleHit();
             }
             // Sprawdzenie kolizji pocisku z graczem 2
             if (bullet.getGlobalBounds().intersects(player2.getGlobalBounds())) {
                 bullet.deactive();
-                gameOver = true; // Ustaw flagę GAME OVER
-                levelTimer.pause();
+                handleHit();
             }
         }
 
@@ -1292,14 +1290,12 @@ bool runLevel2(sf::RenderWindow& window, sf::Font& font, const std::string& play
             // Sprawdzenie kolizji pocisku z graczem 1
             if (bullet.getGlobalBounds().intersects(player.getGlobalBounds())) {
                 bullet.deactive();
-                gameOver = true; // Ustaw flagę GAME OVER
-                levelTimer.pause();
+                handleHit();
             }
             // Sprawdzenie kolizji pocisku z graczem 2
             if (bullet.getGlobalBounds().intersects(player2.getGlobalBounds())) {
                 bullet.deactive();
-                gameOver = true; // Ustaw flagę GAME OVER
-                levelTimer.pause();
+                handleHit();
             }
         }
 
@@ -1309,14 +1305,12 @@ bool runLevel2(sf::RenderWindow& window, sf::Font& font, const std::string& play
             // Sprawdzenie kolizji pocisku z graczem 1
             if (bullet.getGlobalBounds().intersects(player.getGlobalBounds())) {
                 bullet.deactive();
-                gameOver = true; // Ustaw flagę GAME OVER
-                levelTimer.pause();
+                handleHit();
             }
             // Sprawdzenie kolizji pocisku z graczem 2
             if (bullet.getGlobalBounds().intersects(player2.getGlobalBounds())) {
                 bullet.deactive();
-                gameOver = true; // Ustaw flagę GAME OVER
-                levelTimer.pause();
+                handleHit();
             }
         }
 
@@ -1326,14 +1320,12 @@ bool runLevel2(sf::RenderWindow& window, sf::Font& font, const std::string& play
             // Sprawdzenie kolizji pocisku z graczem 1
             if (bullet.getGlobalBounds().intersects(player.getGlobalBounds())) {
                 bullet.deactive();
-                gameOver = true; // Ustaw flagę GAME OVER
-                levelTimer.pause();
+                handleHit();
             }
             // Sprawdzenie kolizji pocisku z graczem 2
             if (bullet.getGlobalBounds().intersects(player2.getGlobalBounds())) {
                 bullet.deactive();
-                gameOver = true; // Ustaw flagę GAME OVER
-                levelTimer.pause();
+                handleHit();
             }
         }
 
@@ -1704,16 +1696,16 @@ bool runLevel3(sf::RenderWindow& window, sf::Font& font, const std::string& play
     timerText.setPosition(20, 20);  // Dowolna pozycja w rogu
 
     sf::Music backgroundMusic;
-    if (!backgroundMusic.openFromFile("Sounds/music.mp3")) {
-        std::cerr << "Nie można załadować muzyki z Sounds/music.mp3\n";
+    if (!backgroundMusic.openFromFile("Sounds/music.wav")) {
+        std::cerr << "Nie można załadować muzyki z Sounds/music.wav\n";
     } else {
         backgroundMusic.setLoop(true);
         backgroundMusic.play();
     }
 
     sf::Music winnerMusic;
-    if (!winnerMusic.openFromFile("Sounds/winner.mp3")) {
-        std::cerr << "Nie można załadować Sounds/winner.mp3\n";
+    if (!winnerMusic.openFromFile("Sounds/winner.wav")) {
+        std::cerr << "Nie można załadować Sounds/winner.wav\n";
     }
 
     sf::SoundBuffer lifeLostBuf;
@@ -1818,7 +1810,7 @@ bool runLevel3(sf::RenderWindow& window, sf::Font& font, const std::string& play
     }
 
     //obsluga ukonczenia poziomu
-    sf::Vector2i targetTileCoordsPlayer1(34, 3);
+    sf::Vector2i targetTileCoordsPlayer1(33, 3);
     sf::Vector2i targetTileCoordsPlayer2(35, 3);
 
     // Create sf::RectangleShape for visual representation
@@ -2224,14 +2216,12 @@ bool runLevel3(sf::RenderWindow& window, sf::Font& font, const std::string& play
             // Sprawdzenie kolizji pocisku z graczem 1
             if (bullet.getGlobalBounds().intersects(player.getGlobalBounds())) {
                 bullet.deactive();
-                gameOver = true; // Ustaw flagę GAME OVER
-                levelTimer.pause();
+                handleHit();
             }
             // Sprawdzenie kolizji pocisku z graczem 2
             if (bullet.getGlobalBounds().intersects(player2.getGlobalBounds())) {
                 bullet.deactive();
-                gameOver = true; // Ustaw flagę GAME OVER
-                levelTimer.pause();
+                handleHit();
             }
         }
 
@@ -2241,14 +2231,12 @@ bool runLevel3(sf::RenderWindow& window, sf::Font& font, const std::string& play
             // Sprawdzenie kolizji pocisku z graczem 1
             if (bullet.getGlobalBounds().intersects(player.getGlobalBounds())) {
                 bullet.deactive();
-                gameOver = true; // Ustaw flagę GAME OVER
-                levelTimer.pause();
+                handleHit();
             }
             // Sprawdzenie kolizji pocisku z graczem 2
             if (bullet.getGlobalBounds().intersects(player2.getGlobalBounds())) {
                 bullet.deactive();
-                gameOver = true; // Ustaw flagę GAME OVER
-                levelTimer.pause();
+                handleHit();
             }
         }
 
@@ -2258,14 +2246,12 @@ bool runLevel3(sf::RenderWindow& window, sf::Font& font, const std::string& play
             // Sprawdzenie kolizji pocisku z graczem 1
             if (bullet.getGlobalBounds().intersects(player.getGlobalBounds())) {
                 bullet.deactive();
-                gameOver = true; // Ustaw flagę GAME OVER
-                levelTimer.pause();
+                handleHit();
             }
             // Sprawdzenie kolizji pocisku z graczem 2
             if (bullet.getGlobalBounds().intersects(player2.getGlobalBounds())) {
                 bullet.deactive();
-                gameOver = true; // Ustaw flagę GAME OVER
-                levelTimer.pause();
+                handleHit();
             }
         }
 
