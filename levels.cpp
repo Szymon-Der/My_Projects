@@ -801,9 +801,10 @@ bool runLevel2(sf::RenderWindow& window, sf::Font& font, const std::string& play
     Character player("Characters/Character 9.png"); //POMARANCZOWY
     Character player2("Characters/Character 1.png"); //CZARNY
     NPC npc("Characters/Mushroom.png", true, true);
-    /*NPC npc2("Characters/Mushroom.png", false, std::make_pair(400.f, 600.f));
-    NPC npc3("Characters/Mushroom.png", false, std::make_pair(200.f, 350.f));
-    NPC npc4("Characters/Mushroom.png", false, std::make_pair(800.f, 1000.f));*/
+    NPC npc2("Characters/Mushroom.png", true, true);
+    NPC npc3("Characters/Mushroom.png", true, true);
+    NPC npc4("Characters/Mushroom.png", true, false);
+
 
     sf::SoundBuffer beepBuf, gameoverBuf;
     beepBuf.loadFromFile("Sounds/beep.wav");
@@ -813,10 +814,10 @@ bool runLevel2(sf::RenderWindow& window, sf::Font& font, const std::string& play
     // Ustawienie początkowych pozycji postaci
     player.setPosition(1200.f, 575.f);
     player2.setPosition(100.f, 590.f);
-    npc.setPosition(65.f, 450.f);
-    /*npc2.setPosition(550.f, 300.f);
-    npc3.setPosition(250.f, 200.f);
-    npc4.setPosition(900.f, 300.f);*/
+    npc.setPosition(100.f, 450.f);
+    npc2.setPosition(100.f, 150.f);
+    npc3.setPosition(750.f, 300.f);
+    npc4.setPosition(1150.f, 150.f);
 
     sf::Clock clock;
     Timer levelTimer(50);
@@ -917,17 +918,17 @@ bool runLevel2(sf::RenderWindow& window, sf::Font& font, const std::string& play
         {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11}, // 1
         {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,54, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11}, // 2
         {13, 0, 0, 0, 0, 0,32,33,33,33,33,33,33,33,33,33,33,33,33,33,35,33,33,33,33,33,33,33,33,33,33,33,33,33,34, 0, 0, 0, 0,11}, // 3
-        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11}, // 4
-        {27, 33, 33, 34, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,32,33,11}, // 5
-        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,31, 0, 0,11}, // 6
+        {27, 34, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32,17}, // 4
+        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0,0,11}, // 5
+        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0, 0, 0,11}, // 6
         {27,33,33,33,33,33,33,33,33,33,33,33,34, 0, 0, 0, 0,32,33,33,45, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11}, // 7
         {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,55, 0, 0, 0, 0,32,33,33,33,33,33,33,33,33,33,33,33,33,33,17}, // 8
-        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 34, 0, 0, 0, 0,55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11}, // 9
-        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,37, 33, 34, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11}, // 10
+        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 34, 0, 0, 0, 0,37, 34, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11}, // 9
+        {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11}, // 10
         {13, 0, 0, 0,32,33,33,33,33,33,33,33,33,33,33,33,33,33,33,33,45, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11}, // 11
         {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,37,33,33,33,33,33,33,33,33,33,33,33,33,34, 0, 0, 0,32,33,17}, // 12
-        {27,33,34, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11}, // 13
-        {13, 0, 0,31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 34, 0, 0,11}, // 14
+        {27,34,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11}, // 13
+        {13, 0, 0,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 34, 0, 0,11}, // 14
         {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11}, // 15
         {27,33,33,33,33,33,33,33,33,33,33,33,33,33,33,34, 0, 0, 0, 0,55, 0, 0, 0, 0,32,33,33,33,33,33,33,33,33,33,33,33,33,33,17}, // 16
         {13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,11}, // 17
@@ -949,8 +950,8 @@ bool runLevel2(sf::RenderWindow& window, sf::Font& font, const std::string& play
     }
 
     //obsluga ukonczenia poziomu
-    sf::Vector2i targetTileCoordsPlayer1(23, 19); // Column, Row 3 19
-    sf::Vector2i targetTileCoordsPlayer2(17, 19); // Column, Row 2 19
+    sf::Vector2i targetTileCoordsPlayer1(21, 2); // Column, Row 3 19
+    sf::Vector2i targetTileCoordsPlayer2(19, 2); // Column, Row 2 19
 
     // Create sf::RectangleShape for visual representation
     sf::RectangleShape targetRectPlayer1Visual(sf::Vector2f(tileSize, tileSize));
@@ -1255,17 +1256,17 @@ bool runLevel2(sf::RenderWindow& window, sf::Font& font, const std::string& play
 
         // Aktualizacja stanu NPC
         npc.update(dt);
-       /* npc2.update(dt);
-        npc3.update(dt);
-        npc4.update(dt);*/
+       npc2.update(dt);
+         npc3.update(dt);
+      npc4.update(dt);
 
         // Interakcje ze ścianami dla graczy, pocisków i NPC
         resolveCollisions(player, solidTiles);
         resolveCollisions(player2, solidTiles);
         resolveCollisions(npc, solidTiles);
-       /* resolveCollisions(npc2, solidTiles);
-        resolveCollisions(npc3, solidTiles);
-        resolveCollisions(npc4, solidTiles);*/
+        resolveCollisions(npc2, solidTiles);
+       resolveCollisions(npc3, solidTiles);
+         resolveCollisions(npc4, solidTiles);
 
         // Kolizje pocisków z NPC
         for (auto& bullet : npc.getBullets()) {
@@ -1285,12 +1286,65 @@ bool runLevel2(sf::RenderWindow& window, sf::Font& font, const std::string& play
             }
         }
 
+        for (auto& bullet : npc2.getBullets()) {
+            bullet.update(dt);
+            resolveCollisions(bullet, solidTiles);
+            // Sprawdzenie kolizji pocisku z graczem 1
+            if (bullet.getGlobalBounds().intersects(player.getGlobalBounds())) {
+                bullet.deactive();
+                gameOver = true; // Ustaw flagę GAME OVER
+                levelTimer.pause();
+            }
+            // Sprawdzenie kolizji pocisku z graczem 2
+            if (bullet.getGlobalBounds().intersects(player2.getGlobalBounds())) {
+                bullet.deactive();
+                gameOver = true; // Ustaw flagę GAME OVER
+                levelTimer.pause();
+            }
+        }
+
+        for (auto& bullet : npc3.getBullets()) {
+            bullet.update(dt);
+            resolveCollisions(bullet, solidTiles);
+            // Sprawdzenie kolizji pocisku z graczem 1
+            if (bullet.getGlobalBounds().intersects(player.getGlobalBounds())) {
+                bullet.deactive();
+                gameOver = true; // Ustaw flagę GAME OVER
+                levelTimer.pause();
+            }
+            // Sprawdzenie kolizji pocisku z graczem 2
+            if (bullet.getGlobalBounds().intersects(player2.getGlobalBounds())) {
+                bullet.deactive();
+                gameOver = true; // Ustaw flagę GAME OVER
+                levelTimer.pause();
+            }
+        }
+
+        for (auto& bullet : npc4.getBullets()) {
+            bullet.update(dt);
+            resolveCollisions(bullet, solidTiles);
+            // Sprawdzenie kolizji pocisku z graczem 1
+            if (bullet.getGlobalBounds().intersects(player.getGlobalBounds())) {
+                bullet.deactive();
+                gameOver = true; // Ustaw flagę GAME OVER
+                levelTimer.pause();
+            }
+            // Sprawdzenie kolizji pocisku z graczem 2
+            if (bullet.getGlobalBounds().intersects(player2.getGlobalBounds())) {
+                bullet.deactive();
+                gameOver = true; // Ustaw flagę GAME OVER
+                levelTimer.pause();
+            }
+        }
+
+
+
         //sprawdzanie kolizcji gracze npc
         sf::FloatRect player1Bounds = player.getGlobalBounds();
         sf::FloatRect npcBounds = npc.getGlobalBounds();
-        /*sf::FloatRect npc2Bounds = npc2.getGlobalBounds();
-        sf::FloatRect npc3Bounds = npc3.getGlobalBounds();
-        sf::FloatRect npc4Bounds = npc4.getGlobalBounds();*/
+        sf::FloatRect npc2Bounds = npc2.getGlobalBounds();
+       sf::FloatRect npc3Bounds = npc3.getGlobalBounds();
+        sf::FloatRect npc4Bounds = npc4.getGlobalBounds();
 
         if (player1Bounds.intersects(npcBounds)) {
             float player1Bottom = player1Bounds.top + player1Bounds.height;
@@ -1304,7 +1358,7 @@ bool runLevel2(sf::RenderWindow& window, sf::Font& font, const std::string& play
             }
         }
 
-       /* if (player1Bounds.intersects(npc2Bounds)) {
+       if (player1Bounds.intersects(npc2Bounds)) {
             float player1Bottom = player1Bounds.top + player1Bounds.height;
             float overlapY = player1Bottom - npc2Bounds.top;
 
@@ -1338,7 +1392,7 @@ bool runLevel2(sf::RenderWindow& window, sf::Font& font, const std::string& play
             } else {
                 handleHit();
             }
-        } */
+        }
 
         sf::FloatRect player2Bounds = player2.getGlobalBounds();
 
@@ -1354,7 +1408,7 @@ bool runLevel2(sf::RenderWindow& window, sf::Font& font, const std::string& play
             }
         }
 
-      /*  if (player2Bounds.intersects(npc2Bounds)) {
+       if (player2Bounds.intersects(npc2Bounds)) {
             float player2Bottom = player2Bounds.top + player2Bounds.height;
             float overlapY = player2Bottom - npc2Bounds.top;
 
@@ -1366,7 +1420,7 @@ bool runLevel2(sf::RenderWindow& window, sf::Font& font, const std::string& play
             }
         }
 
-        if (player2Bounds.intersects(npc3Bounds)) {
+         if (player2Bounds.intersects(npc3Bounds)) {
             float player2Bottom = player2Bounds.top + player2Bounds.height;
             float overlapY = player2Bottom - npc3Bounds.top;
 
@@ -1388,7 +1442,7 @@ bool runLevel2(sf::RenderWindow& window, sf::Font& font, const std::string& play
             } else {
                 handleHit();
             }
-        } */
+        }
 
 
         //sprawdzanie warunkow ukonczenia poziomu. czy obie postacie sa na miejscach konczowcyh
@@ -1432,6 +1486,75 @@ bool runLevel2(sf::RenderWindow& window, sf::Font& font, const std::string& play
             bullets.end()
             );
 
+        auto& bullets2 = npc2.getBullets();
+        for (auto& bullet : bullets2) {
+            bullet.update(dt);
+            resolveCollisions(bullet, solidTiles);
+
+            if (bullet.getGlobalBounds().intersects(player.getGlobalBounds())) {
+                bullet.deactive();
+                handleHit();      // obniża lives, odtwarza dźwięk, serduszka…
+            }
+
+            if (bullet.getGlobalBounds().intersects(player2.getGlobalBounds())) {
+                bullet.deactive();
+                handleHit();
+            }
+        }
+
+        bullets2.erase(
+            std::remove_if(bullets2.begin(), bullets2.end(), [](const Bullet& b) {
+                return !b.getActive();
+            }),
+            bullets2.end()
+            );
+
+        auto& bullets3 = npc3.getBullets();
+        for (auto& bullet : bullets3) {
+            bullet.update(dt);
+            resolveCollisions(bullet, solidTiles);
+
+            if (bullet.getGlobalBounds().intersects(player.getGlobalBounds())) {
+                bullet.deactive();
+                handleHit();      // obniża lives, odtwarza dźwięk, serduszka…
+            }
+
+            if (bullet.getGlobalBounds().intersects(player2.getGlobalBounds())) {
+                bullet.deactive();
+                handleHit();
+            }
+        }
+
+        bullets3.erase(
+            std::remove_if(bullets3.begin(), bullets3.end(), [](const Bullet& b) {
+                return !b.getActive();
+            }),
+            bullets3.end()
+            );
+
+        auto& bullets4 = npc4.getBullets();
+        for (auto& bullet : bullets4) {
+            bullet.update(dt);
+            resolveCollisions(bullet, solidTiles);
+
+            if (bullet.getGlobalBounds().intersects(player.getGlobalBounds())) {
+                bullet.deactive();
+                handleHit();      // obniża lives, odtwarza dźwięk, serduszka…
+            }
+
+            if (bullet.getGlobalBounds().intersects(player2.getGlobalBounds())) {
+                bullet.deactive();
+                handleHit();
+            }
+        }
+
+        bullets4.erase(
+            std::remove_if(bullets4.begin(), bullets4.end(), [](const Bullet& b) {
+                return !b.getActive();
+            }),
+            bullets4.end()
+            );
+
 
         window.clear(sf::Color(50, 50, 50));
         if (hasBackground) window.draw(background);
@@ -1451,15 +1574,25 @@ bool runLevel2(sf::RenderWindow& window, sf::Font& font, const std::string& play
         window.draw(player);
         window.draw(player2);
         window.draw(npc);
-      /*  window.draw(npc2);
-        window.draw(npc3);
-        window.draw(npc4); */
+      window.draw(npc2);
+          window.draw(npc3);
+        window.draw(npc4);
 
 
 
         for (auto& bullet : bullets) {
             window.draw(bullet);
         }
+        for (auto& bullet : bullets2) {
+            window.draw(bullet);
+        }
+        for (auto& bullet : bullets3) {
+            window.draw(bullet);
+        }
+        for (auto& bullet : bullets4) {
+            window.draw(bullet);
+        }
+
         for (auto& h : hearts) {
             window.draw(h);
         }
