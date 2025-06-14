@@ -2183,6 +2183,7 @@ bool runLevel3(sf::RenderWindow& window, sf::Font& font, const std::string& play
             sf::FloatRect elevatorBounds = elevator.getGlobalBounds();
 
             if (charBounds.intersects(elevatorBounds)) {
+                // Kolizja z górną krawędzią windy
                 float charBottom = charBounds.top + charBounds.height;
                 float overlapY = charBottom - elevatorBounds.top;
 
@@ -2190,17 +2191,20 @@ bool runLevel3(sf::RenderWindow& window, sf::Font& font, const std::string& play
                     character.setPosition(character.getPosition().x, elevatorBounds.top - charBounds.height);
                     character.setGroundContact(true);
                     character.setVelocity(character.getVelocity().x, 0);
+                    // Przesuń postać razem z windą
                     character.sf::Sprite::move(elevDisplacement);
                 }
+                // Kolizja z dolną krawędzią windy
                 else if (character.getVelocity().y < 0 && charBounds.top > elevatorBounds.top) {
                     character.setVelocity(character.getVelocity().x, 0);
                     character.setPosition(character.getPosition().x, elevatorBounds.top + elevatorBounds.height);
                 }
+                // Kolizje boczne
                 else {
-                    if (character.getVelocity().x > 0) {
-                        character.setPosition(elevatorBounds.left - charBounds.width, character.getPosition().y);
-                    } else if (character.getVelocity().x < 0) {
-                        character.setPosition(elevatorBounds.left + elevatorBounds.width, character.getPosition().y);
+                    if (character.getVelocity().x > 0) { // Postać porusza się w prawo
+                        character.setPosition(elevatorBounds.left - charBounds.width / 2.f, character.getPosition().y);
+                    } else if (character.getVelocity().x < 0) { // Postać porusza się w lewo
+                        character.setPosition(elevatorBounds.left + elevatorBounds.width + charBounds.width / 2.f, character.getPosition().y);
                     }
                 }
             }
