@@ -13,3 +13,10 @@ https://font.download/font/gatrich
 linki od użytej musyki:
 https://archive.org/details/wearethechampions_201908
 https://incompetech.com/music/royalty-free/music.html
+
+link do tekstur postaci:
+https://monopixelart.itch.io/forest-monsters-pixel-art
+https://bdragon1727.itch.io/pixel-character-part-5
+
+link do tesktur i tla:
+https://free-game-assets.itch.io/free-swamp-2d-tileset-pixel-art
